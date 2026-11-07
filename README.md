@@ -1,13 +1,16 @@
-# Dandó
-Magyar nyelvű, telepíthető PWA feladatokhoz, képes jegyzetekhez és határidőkhöz.
+# Dandó – új felület és felhőszinkron
 
-## Használat
-- GitHub Pages címen nyisd meg iPhone Safariban vagy Windows Edge/Chrome böngészőben.
-- iPhone: Megosztás → Főképernyőhöz adás.
-- Windows: böngésző menü → Alkalmazás telepítése.
+## Telepítés GitHub Pages-re
+Cseréld le a repó gyökérkönyvtárában a fájlokat az itt található fájlokra. A `supabase-setup.sql` és a `supabase-config.js` is kerüljön a gyökérbe.
 
-## Adattárolás
-Az adatok az adott eszköz böngészőjében, helyben tárolódnak. Nincs automatikus szinkron a készülékek között. Az „Adatok exportálása” JSON mentést készít.
+## Felhőszinkron beállítása
+1. Hozz létre egy Supabase projektet.
+2. A Dashboard SQL Editor részén futtasd a `supabase-setup.sql` teljes tartalmát.
+3. A Authentication / URL Configuration részen állítsd a Site URL értékét erre: `https://kancsalbrine.github.io/dando-app/` (és add hozzá ezt a Redirect URL-ekhez is).
+4. A Project Settings / API részen másold ki a Project URL-t és a publishable (vagy anon) kulcsot.
+5. A `supabase-config.js` fájlban cseréld le a két `IDE_JON...` értéket.
+6. Töltsd fel a módosított fájlokat GitHubra, majd várd meg a Pages újratelepítését.
+7. Nyisd meg a Dandót, válaszd a Szinkronizálás gombot, hozz létre fiókot, erősítsd meg az e-mail-címed, majd jelentkezz be.
+8. A másik eszközön ugyanazzal a fiókkal jelentkezz be.
 
-## GitHub Pages
-A GitHub Actions workflow automatikusan publikálja a main ágra feltöltött változásokat. Ha szükséges, a repository Settings → Pages résznél válaszd a GitHub Actions forrást.
+A `publishable`/`anon` kulcs böngészőben használható, a `service_role` titkos kulcsot soha ne tedd a weboldalba. A táblán Row Level Security védi, hogy mindenki csak a saját adatait olvashassa és módosíthassa.
