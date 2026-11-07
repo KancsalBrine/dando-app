@@ -1,0 +1,124 @@
+
+/* Dandó V3.6 – mobiloptimalizálás, csak megjelenítés; az adatokat nem módosítja */
+:root { -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body { min-width: 0; }
+button, input, select, textarea { max-width: 100%; }
+button, [role="button"] { touch-action: manipulation; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 800px) {
+  html { font-size: 16px; }
+  body { overflow-x: hidden; }
+  .shell, .main, .panel, .columns, .hero { min-width: 0; }
+  .main {
+    padding: 16px 12px calc(112px + env(safe-area-inset-bottom));
+    margin: 0;
+  }
+  .topbar {
+    gap: 10px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+  }
+  .topbar h1 { font-size: clamp(21px, 5.7vw, 28px); line-height: 1.2; }
+  .topbar small { font-size: 10px; }
+  .header-actions { display: flex; gap: 6px; }
+  .header-actions .primary { min-height: 42px; padding: 10px 12px; }
+  .panel, .metric { padding: 15px; border-radius: 15px; }
+  .hero { padding: 18px; border-radius: 16px; }
+  .metrics { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 9px; }
+  .metric strong { font-size: clamp(21px, 6vw, 29px); }
+  .sidebar {
+    z-index: 30;
+    height: calc(75px + env(safe-area-inset-bottom));
+    padding: 5px 6px env(safe-area-inset-bottom);
+    box-shadow: 0 -5px 25px #17162c12;
+    background: var(--surface);
+  }
+  .sidebar nav {
+    display: flex;
+    height: 66px;
+    gap: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sidebar nav::-webkit-scrollbar { display: none; }
+  .nav {
+    min-width: 76px;
+    flex: 0 0 76px;
+    min-height: 58px;
+    padding: 7px 4px;
+    font-size: 10px;
+    border-radius: 12px;
+    scroll-snap-align: start;
+    white-space: normal;
+  }
+  .nav span { font-size: 21px; }
+  .nav.active { background: var(--soft); color: var(--accent-strong); }
+  .button, .mini-button, .roster-toolbar button { min-height: 44px; }
+  input, select, textarea { font-size: 16px; min-height: 44px; }
+  textarea { min-height: 95px; }
+  .toolbar { flex-wrap: wrap; }
+  .toolbar > *, .roster-toolbar > * { min-width: 0; }
+  .roster-toolbar { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+  .roster-toolbar label { min-width: 0; width: 100%; }
+  .roster-toolbar label:has(input[type="file"]) { grid-column: 1 / -1; }
+  .roster-toolbar input[type="file"] { max-width: 100%; width: 100%; font-size: 12px; }
+  .roster-toolbar button { width: 100%; padding-inline: 7px; font-size: 12px; }
+  .roster-toolbar .danger { grid-column: 1 / -1; }
+  .roster-scroll {
+    position: relative;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: min(68vh, 650px);
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 11px;
+  }
+  .roster-table { font-size: 12px; }
+  .roster-table th, .roster-table td { min-width: 39px; height: 43px; }
+  .roster-table th.roster-person {
+    min-width: 128px;
+    max-width: 128px;
+    width: 128px;
+    padding: 0 6px;
+    font-size: 10px;
+    white-space: normal;
+    line-height: 1.2;
+    box-shadow: 2px 0 5px #00000012;
+  }
+  .roster-table thead th { top: 0; }
+  .roster-table td:active { outline: 3px solid var(--accent); outline-offset: -3px; }
+  .roster-legend { line-height: 1.9; }
+  .worker-grid { gap: 7px; }
+  .worker-pill { padding: 9px 11px; font-size: 12px; }
+  .item-grid { grid-template-columns: 1fr; }
+  .order-line { grid-template-columns: minmax(0,1fr) 75px auto; }
+  .row-actions { flex-wrap: wrap; }
+  .summary-row { align-items: flex-start; }
+  dialog {
+    width: calc(100% - 16px);
+    max-height: min(90dvh, 780px);
+    overflow-y: auto;
+    padding: 18px;
+    border-radius: 18px;
+  }
+  .dialog-buttons { position: sticky; bottom: -18px; padding: 10px 0 18px; background: var(--surface); }
+  .dialog-buttons button { flex: 1; }
+  .toast { bottom: calc(90px + env(safe-area-inset-bottom)); left: 12px; right: 12px; max-width: none; }
+  .auth-panel { margin: 25px auto; }
+}
+@media (max-width: 360px) {
+  .main { padding-inline: 9px; }
+  .metrics { gap: 6px; }
+  .metric { padding: 11px; }
+  .roster-table th.roster-person { min-width: 110px; max-width: 110px; width: 110px; }
+}
+@media print {
+  .sidebar { display: none !important; }
+  .roster-scroll { max-height: none; overflow: visible; }
+}
