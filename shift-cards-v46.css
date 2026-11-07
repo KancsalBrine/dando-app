@@ -1,0 +1,44 @@
+
+/* Dandó V4.6: látványterv szerinti műszakkártyák */
+.shift-grid{align-items:stretch}
+.shift-grid>.shift-card{margin:0;min-width:0;display:flex;flex-direction:column;gap:0;padding:20px 21px!important;border-radius:18px}
+.shift-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 17px}
+.shift-card-head h2{font-size:18px;line-height:1.25;margin:0}
+.shift-badge{display:inline-flex;align-items:center;border-radius:999px;font-size:11px;font-weight:750;white-space:nowrap;padding:7px 11px}
+.shift-badge.active{background:#126437;color:#d3ffe5;border:1px solid #2c9c66}
+.shift-badge.upcoming{background:#123e74;color:#c8e9ff;border:1px solid #2e70b5}
+.shift-card-time{display:flex;align-items:center;gap:11px;padding:0 0 14px;border-bottom:1px solid var(--line);min-width:0}
+.shift-symbol{font-size:25px;line-height:1;flex:0 0 27px;text-align:center}
+.shift-symbol.sun{color:#ffc63f;text-shadow:0 0 12px #ffbd4166}
+.shift-symbol.moon{color:#57baff;text-shadow:0 0 13px #41b9ff77}
+.shift-time-text{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
+.shift-time-text strong{font-size:14px;line-height:1.25;color:var(--text)}
+.shift-time-text small{font-size:11px;line-height:1.35;color:var(--muted)}
+.shift-countdown{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;background:linear-gradient(145deg,#56348c,#35235e);border:1px solid #7952c5;border-radius:11px;padding:8px 11px;color:#fff;box-shadow:0 0 15px #a35aff28}
+.shift-countdown small{font-size:10px;color:#e3d2ff}.shift-countdown strong{font-size:13px;white-space:nowrap}
+.shift-people{display:flex;flex-direction:column;margin-top:5px}
+.shift-person{display:flex;align-items:center;gap:11px;min-height:46px;padding:9px 0;border-bottom:1px solid var(--line)}
+.shift-person:last-child{border-bottom:0}
+.shift-avatar{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:50%;background:#29354d;color:#b9c8e0;border:1px solid #546781;font-size:17px}
+.shift-avatar.on{border-color:#38d999;box-shadow:0 0 0 2px #35d89915}
+.shift-person-name{font-size:13px;font-weight:650;color:var(--text);flex:1;min-width:0;overflow-wrap:anywhere}
+.shift-online{width:7px;height:7px;border-radius:50%;background:#38e59b;box-shadow:0 0 9px #38e59b}
+.shift-card-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:13px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+.shift-card-link{border:0;background:transparent;color:var(--accent-strong);font-size:11px;font-weight:750;padding:6px 2px;white-space:nowrap;cursor:pointer}
+.shift-card-link:hover{text-decoration:underline}
+.shift-empty{font-size:12px;color:var(--muted);padding:18px 0}
+html[data-theme="dark"] .shift-card{background:linear-gradient(155deg,#15223a,#0d1728 85%)!important;border:1px solid #3a4b71!important;box-shadow:inset 0 1px #ffffff0d,0 0 20px #874aff1c,0 12px 28px #0006!important}
+@media(max-width:800px){
+ .shift-grid>.shift-card{padding:15px!important;gap:0}
+ .shift-card-head{margin-bottom:13px}
+ .shift-card-head h2{font-size:16px}
+ .shift-badge{font-size:10px;padding:6px 9px}
+ .shift-card-time{gap:9px;padding-bottom:11px}
+ .shift-time-text strong{font-size:13px}
+ .shift-time-text small{font-size:10px}
+ .shift-countdown{padding:7px 9px}.shift-countdown strong{font-size:11px}
+ .shift-person{min-height:40px;padding:6px 0}
+ .shift-person-name{font-size:12px}
+ .shift-avatar{width:28px;height:28px;flex-basis:28px}
+ .shift-card-foot{padding-top:9px}
+}

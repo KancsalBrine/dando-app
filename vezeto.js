@@ -117,26 +117,36 @@ function liveShift(){
  }
  return null;
 }
+function shiftIcon(code){return code==='e'?'☀':'☾'}
+function shiftPeople(workers,active){
+ return `<div class="shift-people">${workers.map((name,i)=>`<div class="shift-person"><span class="shift-avatar ${active?'on':''}" aria-hidden="true">♟</span><span class="shift-person-name">${esc(name)}</span>${active?'<span class="shift-online" title="Beosztva az aktuális műszakra"></span>':''}</div>`).join('')}</div>`;
+}
+function shiftCardHeader(title,label,code,date,start,end,countdown){
+ return `<div class="shift-card-head"><h2>${title}</h2><span class="shift-badge ${countdown?'upcoming':'active'}">${countdown?'Hamarosan':'Aktuális műszak'}</span></div>
+ <div class="shift-card-time"><span class="shift-symbol ${code==='e'?'sun':'moon'}" aria-hidden="true">${shiftIcon(code)}</span><div class="shift-time-text"><strong>${esc(label)}</strong><small>${esc(start)}–${esc(end)} · ${esc(date)}</small></div>${countdown?`<span class="shift-countdown"><small>Kezdés:</small><strong>${esc(countdown)}</strong></span>`:''}</div>`;
+}
 function workingPanel(){
  const shift=liveShift();
- if(!shift)return `<section class="panel shift-panel"><div class="section-head"><div><h2>Ki dolgozik most?</h2><p>Jelenleg nincs aktív, beállított műszak.</p></div></div><p class="hint">A műszakok időpontját a Beállításokban módosíthatod.</p></section>`;
+ if(!shift)return `<section class="panel shift-panel shift-card"><div class="shift-card-head"><h2>Ki dolgozik most?</h2></div><p class="hint">Jelenleg nincs aktív, beállított műszak. A műszakidőket a Beállításokban adhatod meg.</p></section>`;
  const month=shift.date.slice(0,7);
- if(month!==state.rosterMonth)return `<section class="panel"><h2>Ki dolgozik most?</h2><p>Az aktuális műszak ${esc(shift.date)} napi beosztását frissítsd a Frissítés gombbal.</p></section>`;
- if(state.rosterError)return `<section class="panel"><h2>Ki dolgozik most?</h2><p>Nem sikerült lekérni a beosztást: ${esc(state.rosterError)}</p></section>`;
+ const prefs=state.prefs||{};
+ const start=toTime(shift.code==='e'?prefs.shift_one_start:prefs.shift_two_start);
+ const end=toTime(shift.code==='e'?prefs.shift_one_end:prefs.shift_two_end);
+ const head=shiftCardHeader('Ki dolgozik most?',shift.label,shift.code,shift.date,start,end,null);
+ if(month!==state.rosterMonth||state.rosterError)return `<section class="panel shift-panel shift-card">${head}<p class="hint">A beosztás nem érhető el ehhez a hónaphoz. Nyisd meg a Beosztást a frissítéshez.</p><button class="shift-card-link" data-view="roster">Beosztás megnyitása →</button></section>`;
  const workers=workingNow(state.rosterEntries,shift.date,shift.code);
- return `<section class="panel shift-panel"><div class="section-head"><div><h2>Ki dolgozik most?</h2><p>${esc(shift.label)} · ${esc(shift.date)} · Budapest idő szerint</p></div></div>${workers.length?`<div class="worker-grid">${workers.map(name=>`<span class="worker-pill">● ${esc(name)}</span>`).join('')}</div><p class="hint">${workers.length} dolgozó beosztva. A „8” jelölés mindkét műszakban szerepel.</p><button class="button quiet small" data-view="roster">Beosztás megnyitása</button>`:'<div class="empty">Erre a műszakra még nincs dolgozó beosztva.</div>'}</section>`;
+ return `<section class="panel shift-panel shift-card">${head}${workers.length?shiftPeople(workers,true):'<p class="shift-empty">Nincs beosztott dolgozó.</p>'}<div class="shift-card-foot"><span>${workers.length} fő beosztva</span><button class="shift-card-link" data-view="roster">Beosztás →</button></div></section>`;
 }
 function nextShiftPanel(){
  const p=state.prefs;
  if(!p?.shift_one_start||!p?.shift_one_end||!p?.shift_two_start||!p?.shift_two_end){
-  return `<section class="panel"><h2>Következő műszak</h2><p class="hint">Előbb add meg a műszakidőket a Beállítások menüben.</p></section>`;
+  return `<section class="panel shift-panel shift-card"><h2>Következő műszak</h2><p class="hint">Add meg a műszakidőket a Beállításokban.</p></section>`;
  }
  const now=budapestParts(),parse=t=>{const [h,m]=toTime(t).split(':').map(Number);return h*60+m;};
  const candidates=[];
  for(const [code,start,end,label] of [['e',p.shift_one_start,p.shift_one_end,p.shift_one_name||'Első műszak'],['n',p.shift_two_start,p.shift_two_end,p.shift_two_name||'Második műszak']]){
-  const minute=parse(start);
   for(let offset=0;offset<=1;offset++){
-   const diff=offset*1440+minute-now.minute;
+   const diff=offset*1440+parse(start)-now.minute;
    if(diff<=0)continue;
    const date=new Date(now.date+'T12:00:00Z');
    date.setUTCDate(date.getUTCDate()+offset);
@@ -144,14 +154,12 @@ function nextShiftPanel(){
   }
  }
  candidates.sort((a,b)=>a.diff-b.diff);
- const next=candidates[0];
- if(!next)return '';
- const isLoaded=next.date.slice(0,7)===state.rosterMonth&&!state.rosterError;
- const workers=isLoaded?workingNow(state.rosterEntries,next.date,next.code):[];
- const timeUntil=next.diff>=60?`${Math.floor(next.diff/60)} óra ${next.diff%60} perc`:`${next.diff} perc`;
- return `<section class="panel v4-next shift-panel"><div class="section-head"><div><h2>Következő műszak</h2><p>${esc(next.label)} · ${esc(next.date)} · ${esc(next.start)}–${esc(next.end)}</p></div><span class="v4-countdown">${esc(timeUntil)} múlva</span></div>
- ${!isLoaded?`<p class="hint">A következő műszak beosztása másik hónapra esik, vagy nem sikerült betölteni. A Beosztás menüben ellenőrizheted.</p>`:workers.length?`<div class="worker-grid">${workers.map(name=>`<span class="worker-pill">${esc(name)}</span>`).join('')}</div><p class="hint">${workers.length} fő beosztva · a „8” jelölést mindkét műszakban számoljuk</p>`:'<p class="hint">Erre a műszakra még nincs beosztott dolgozó.</p>'}
- <button class="button quiet small" data-view="roster">Beosztás megnyitása</button></section>`;
+ const next=candidates[0];if(!next)return '';
+ const loaded=next.date.slice(0,7)===state.rosterMonth&&!state.rosterError;
+ const workers=loaded?workingNow(state.rosterEntries,next.date,next.code):[];
+ const countdown=next.diff>=60?`${Math.floor(next.diff/60)} ó ${next.diff%60} p`:`${next.diff} perc`;
+ const head=shiftCardHeader('Következő műszak',next.label,next.code,next.date,next.start,next.end,countdown);
+ return `<section class="panel v4-next shift-panel shift-card">${head}${loaded?(workers.length?shiftPeople(workers,false):'<p class="shift-empty">Nincs beosztott dolgozó.</p>'):'<p class="hint">A következő műszak másik hónapban van, vagy a beosztás nem töltődött be.</p>'}<div class="shift-card-foot"><span>${loaded?workers.length+' fő beosztva':'Beosztás ellenőrzése'}</span><button class="shift-card-link" data-view="roster">Beosztás →</button></div></section>`;
 }
 function dashboard(){
  const active=state.templates.filter(t=>t.enabled);
