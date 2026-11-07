@@ -1,4 +1,4 @@
-import { mountRoster, unmountRoster, workingNow, EMPLOYEES } from './beosztas.js?v=41';
+import { mountRoster, unmountRoster, workingNow, EMPLOYEES } from './beosztas.js?v=42';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.js';
 
@@ -119,12 +119,12 @@ function liveShift(){
 }
 function workingPanel(){
  const shift=liveShift();
- if(!shift)return `<section class="panel"><div class="section-head"><div><h2>Ki dolgozik most?</h2><p>Jelenleg nincs aktív, beállított műszak.</p></div></div><p class="hint">A műszakok időpontját a Beállításokban módosíthatod.</p></section>`;
+ if(!shift)return `<section class="panel shift-panel"><div class="section-head"><div><h2>Ki dolgozik most?</h2><p>Jelenleg nincs aktív, beállított műszak.</p></div></div><p class="hint">A műszakok időpontját a Beállításokban módosíthatod.</p></section>`;
  const month=shift.date.slice(0,7);
  if(month!==state.rosterMonth)return `<section class="panel"><h2>Ki dolgozik most?</h2><p>Az aktuális műszak ${esc(shift.date)} napi beosztását frissítsd a Frissítés gombbal.</p></section>`;
  if(state.rosterError)return `<section class="panel"><h2>Ki dolgozik most?</h2><p>Nem sikerült lekérni a beosztást: ${esc(state.rosterError)}</p></section>`;
  const workers=workingNow(state.rosterEntries,shift.date,shift.code);
- return `<section class="panel"><div class="section-head"><div><h2>Ki dolgozik most?</h2><p>${esc(shift.label)} · ${esc(shift.date)} · Budapest idő szerint</p></div><button class="button quiet small" data-view="roster">Beosztás megnyitása</button></div>${workers.length?`<div class="worker-grid">${workers.map(name=>`<span class="worker-pill">● ${esc(name)}</span>`).join('')}</div><p class="hint">${workers.length} dolgozó beosztva. A „8” jelölést mindkét műszaknál megjelenítjük.</p>`:'<div class="empty">Erre a műszakra még nincs dolgozó beosztva.</div>'}</section>`;
+ return `<section class="panel shift-panel"><div class="section-head"><div><h2>Ki dolgozik most?</h2><p>${esc(shift.label)} · ${esc(shift.date)} · Budapest idő szerint</p></div><button class="button quiet small" data-view="roster">Beosztás megnyitása</button></div>${workers.length?`<div class="worker-grid">${workers.map(name=>`<span class="worker-pill">● ${esc(name)}</span>`).join('')}</div><p class="hint">${workers.length} dolgozó beosztva. A „8” jelölést mindkét műszaknál megjelenítjük.</p>`:'<div class="empty">Erre a műszakra még nincs dolgozó beosztva.</div>'}</section>`;
 }
 function nextShiftPanel(){
  const p=state.prefs;
@@ -149,7 +149,7 @@ function nextShiftPanel(){
  const isLoaded=next.date.slice(0,7)===state.rosterMonth&&!state.rosterError;
  const workers=isLoaded?workingNow(state.rosterEntries,next.date,next.code):[];
  const timeUntil=next.diff>=60?`${Math.floor(next.diff/60)} óra ${next.diff%60} perc`:`${next.diff} perc`;
- return `<section class="panel v4-next"><div class="section-head"><div><h2>Következő műszak</h2><p>${esc(next.label)} · ${esc(next.date)} · ${esc(next.start)}–${esc(next.end)}</p></div><span class="v4-countdown">${esc(timeUntil)} múlva</span></div>
+ return `<section class="panel v4-next shift-panel"><div class="section-head"><div><h2>Következő műszak</h2><p>${esc(next.label)} · ${esc(next.date)} · ${esc(next.start)}–${esc(next.end)}</p></div><span class="v4-countdown">${esc(timeUntil)} múlva</span></div>
  ${!isLoaded?`<p class="hint">A következő műszak beosztása másik hónapra esik, vagy nem sikerült betölteni. A Beosztás menüben ellenőrizheted.</p>`:workers.length?`<div class="worker-grid">${workers.map(name=>`<span class="worker-pill">${esc(name)}</span>`).join('')}</div><p class="hint">${workers.length} fő beosztva · a „8” jelölést mindkét műszakban számoljuk</p>`:'<p class="hint">Erre a műszakra még nincs beosztott dolgozó.</p>'}
  <button class="button quiet small" data-view="roster">Beosztás megnyitása</button></section>`;
 }
@@ -160,17 +160,19 @@ function dashboard(){
  const urgent=openLogs().filter(l=>l.priority==='urgent');
  const low=lowProducts();
  const latest=state.logs.slice(0,4);
+ const shift=liveShift();
+ const hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Budapest',hour:'2-digit',hourCycle:'h23'}).format(new Date()));
+ const greeting=hour<10?'Jó reggelt!':hour<18?'Jó napot!':'Jó estét!';
  const pendingOrders=state.orders.filter(o=>o.status==='draft'||o.status==='ordered');
  return `<div class="v4-dashboard">
- <section class="v4-welcome"><div><span class="eyebrow">DANDÓ · VEZETŐI KÖZPONT</span><h2>Napi áttekintés</h2><p>${esc(fmt(today()))} · ${esc(currentShift())}</p></div><button class="button v4-refresh" data-action="refresh">↻ Frissítés</button></section>
- ${workingPanel()}
- ${nextShiftPanel()}
+ <section class="v4-welcome"><div><span class="eyebrow">DANDÓ · VEZETŐI KÖZPONT</span><h2>${greeting} 👋</h2><p>Itt a mai működés összefoglalója. · ${esc(fmt(today()))}</p></div><button class="button v4-refresh" data-action="refresh">↻ Frissítés</button></section>
  <div class="v4-metrics">
-  <button class="v4-metric" data-view="logs"><span class="v4-metric-icon">▤</span><strong>${openLogs().length}</strong><span>Nyitott esemény</span>${urgent.length?`<small>${urgent.length} sürgős</small>`:'<small>Műszaknapló</small>'}</button>
+  <button class="v4-metric" data-view="logs"><span class="v4-metric-icon">⚠</span><strong>${openLogs().length}</strong><span>Nyitott esemény</span>${urgent.length?`<small>${urgent.length} sürgős</small>`:'<small>Műszaknapló</small>'}</button>
   <button class="v4-metric" data-view="checks"><span class="v4-metric-icon">☑</span><strong>${completed}/${active.length}</strong><span>Ellenőrizve</span><small>${pending.length} hátralévő</small></button>
-  <button class="v4-metric" data-view="stock"><span class="v4-metric-icon">▧</span><strong>${low.length}</strong><span>Készlethatáron</span><small>Minimumon vagy alatta</small></button>
+  <button class="v4-metric" data-view="stock"><span class="v4-metric-icon">⬡</span><strong>${low.length}</strong><span>Készlethatáron</span><small>Minimumon vagy alatta</small></button>
   <button class="v4-metric" data-view="orders"><span class="v4-metric-icon">▣</span><strong>${pendingOrders.length}</strong><span>Folyamatban</span><small>Rendelések</small></button>
  </div>
+ <div class="shift-grid">${workingPanel()}${nextShiftPanel()}</div>
  <div class="v4-grid">
   <section class="panel"><div class="section-head"><div><h2>Figyelmet igényel</h2><p>A legfontosabb nyitott teendők</p></div></div>
    ${urgent.slice(0,3).map(l=>`<div class="v4-alert"><span class="v4-alert-dot"></span><div><strong>${esc(l.title)}</strong><small>Sürgős műszaknapló · ${esc(l.shift_date)}</small></div></div>`).join('')}
@@ -323,7 +325,21 @@ async function act(name,el){const id=idKey(el.dataset.id);switch(name){
   case 'remove-order-line':if(document.querySelectorAll('.order-line').length>1)el.closest('.order-line')?.remove();break;
   case 'close-dialog':closeEditor();break;
 }}
+function updateV42Clock(){
+ const now=new Date();
+ const time=new Intl.DateTimeFormat('hu-HU',{timeZone:'Europe/Budapest',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(now);
+ const clock=$('liveClock'),status=$('themeStatus');
+ if(clock)clock.textContent='◷ '+time;
+ if(status)status.textContent=document.documentElement.dataset.theme==='dark'?'☾ Sötét mód':'☀ Világos mód';
+}
 function attach(){
+ setInterval(updateV42Clock,30000);updateV42Clock();
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateV42Clock();});
+ document.addEventListener('click',e=>{
+  const more=e.target.closest('[data-action="mobile-more"]');
+  if(more){e.stopPropagation();document.body.classList.toggle('mobile-menu-open');return;}
+  if(e.target.closest('[data-view]'))document.body.classList.remove('mobile-menu-open');
+ });
   document.addEventListener('click',async e=>{const link=e.target.closest('[data-view]');if(link){setView(link.dataset.view);return;}const el=e.target.closest('[data-action]');if(!el)return;try{await act(el.dataset.action,el);}catch(error){fail(error);showToast(error.message||String(error));}});
   document.addEventListener('change',e=>{if(e.target.id==='logFilter')fillLogRows();});
   $('editorForm').addEventListener('submit',async e=>{e.preventDefault();if(!state.editorHandler)return;const handler=state.editorHandler,button=$('editorSave');button.disabled=true;try{const ok=await handler(e.currentTarget);if(ok)closeEditor();}catch(error){fail(error);showToast(error.message||String(error));}finally{button.disabled=false;}});
