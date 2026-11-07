@@ -1,2 +1,9 @@
-# Dandó V4.3 – új logó
-A ZIP fájljait töltsd fel a GitHub main ág gyökerébe. A `supabase-config.js` maradjon változatlan. Az új üzemanyagkút logó az oldalsávban, a böngésző fülén és a telepített PWA ikonjában is szerepel. A régi PWA-ikon megmaradhat az operációs rendszer ikongyorsítótárában: szükség esetén távolítsd el a telepített alkalmazást, majd telepítsd újra. Az adatok a Supabase-ben maradnak. Megnyitás: https://kancsalbrine.github.io/dando-app/vezeto.html?v=43
+# Dandó V4.4 – mobil javítás
+
+A ZIP fájljait töltsd fel a GitHub main ág gyökerébe, a meglévőket felülírva. A `supabase-config.js` fájlt ne módosítsd, az nincs a csomagban. Nincs adatbázis-módosítás.
+
+Megnyitás: https://kancsalbrine.github.io/dando-app/vezeto.html?v=44
+
+Javítva: kompakt alulról nyíló Továbbiak menü, 2×2-es statisztikák, kisebb és rendezettebb műszakkártyák, mobil fejléc, gombméretek.
+
+Ha a korábbi PWA van telepítve, frissítsd vagy telepítsd újra, miután ellenőrizted a Supabase-szinkronizálást. A tényleges mobilos tesztelés a feltöltés után szükséges.

@@ -337,10 +337,10 @@ function attach(){
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateV42Clock();});
  document.addEventListener('click',e=>{
   const more=e.target.closest('[data-action="mobile-more"]');
-  if(more){e.stopPropagation();document.body.classList.toggle('mobile-menu-open');return;}
-  if(e.target.closest('[data-view]'))document.body.classList.remove('mobile-menu-open');
+  if(more){e.stopPropagation();const opened=document.body.classList.toggle('mobile-menu-open');document.getElementById('mobileMenu')?.setAttribute('aria-hidden',String(!opened));more.setAttribute('aria-expanded',String(opened));return;}
+  if(e.target.closest('[data-view]')||e.target.closest('[data-action="mobile-close"]')||e.target.closest('.mobile-menu-sheet [data-action]')){document.body.classList.remove('mobile-menu-open');document.getElementById('mobileMenu')?.setAttribute('aria-hidden','true');document.querySelector('[data-action="mobile-more"]')?.setAttribute('aria-expanded','false');}
  });
-  document.addEventListener('click',async e=>{const link=e.target.closest('[data-view]');if(link){setView(link.dataset.view);return;}const el=e.target.closest('[data-action]');if(!el)return;try{await act(el.dataset.action,el);}catch(error){fail(error);showToast(error.message||String(error));}});
+  document.addEventListener('click',async e=>{const link=e.target.closest('[data-view]');if(link){setView(link.dataset.view);return;}const el=e.target.closest('[data-action]');if(!el||el.dataset.action==='mobile-close'||el.dataset.action==='mobile-more')return;try{await act(el.dataset.action,el);}catch(error){fail(error);showToast(error.message||String(error));}});
   document.addEventListener('change',e=>{if(e.target.id==='logFilter')fillLogRows();});
   $('editorForm').addEventListener('submit',async e=>{e.preventDefault();if(!state.editorHandler)return;const handler=state.editorHandler,button=$('editorSave');button.disabled=true;try{const ok=await handler(e.currentTarget);if(ok)closeEditor();}catch(error){fail(error);showToast(error.message||String(error));}finally{button.disabled=false;}});
   document.addEventListener('submit',async e=>{if(e.target.id!=='shiftForm')return;e.preventDefault();const button=e.target.querySelector('button[type="submit"]');button.disabled=true;try{await shiftSave(e.target)}catch(error){fail(error);showToast(error.message||String(error))}finally{button.disabled=false}});
