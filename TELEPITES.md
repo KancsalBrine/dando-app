@@ -1,13 +1,11 @@
-# Dandó V3.4 – tiszta telepítés
+# Dandó V3.5 – beosztás import és élő műszak
 
-A csomagban minden, a vezetői felület futtatásához szükséges alkalmazásfájl szerepel.
+1. A ZIP összes fájlját töltsd fel a GitHub `KancsalBrine/dando-app` repó `main` ágába, a meglévőket felülírva. A Supabase adatbázist ne töröld.
+2. Várd meg a GitHub Pages telepítést, majd nyisd meg a `https://kancsalbrine.github.io/dando-app/vezeto.html?v=35` címet.
+3. A **Beosztás** menüben válassz hónapot, majd az **Importálás (Excel/CSV)** mezőben `.xlsx`, `.xls` vagy `.csv` fájlt.
+4. A fájl első munkalapján legyen napokat (1–31) tartalmazó fejlécsor és az ismert dolgozók nevei. Az import a képen látható beosztás formátumát és a Dandó CSV-exportját is kezeli.
+5. Az import előnézetet/összegzést mutat; jóváhagyás után a felismert dolgozók kiválasztott havi beosztását írja felül a Supabase-ben. A fel nem ismert dolgozók korábbi adatai megmaradnak.
+6. A főoldal **Ki dolgozik most?** kártyája a beállított műszakidő, Budapest időzóna és a Supabase-be mentett beosztás alapján mutatja a dolgozókat. A `8` jelölés mindkét műszaknál látható, mert nem tartalmaz pontos kezdési időt.
+7. Másik eszközön a **Frissítés** gomb tölti be az új beosztást.
 
-1. GitHubon a main ág gyökerében cseréld le a fájlokat a csomag azonos nevű fájljaival. Az új fájlok mellett a régi app.js és styles.css törölhető, de nem kötelező. **Ne töröld a GitHub-tárolót és a Supabase-táblákat.**
-2. Ellenőrizd a supabase-config.js értékeit: a csomag a korábbi Dandó böngészőben használható nyilvános projektbeállításait tartalmazza. Titkos service_role kulcsot soha ne tölts fel.
-3. Ha a manager_* táblák és manager_rosters már működnek, a két SQL-t nem kell újra futtatni. Új Supabase projektnél előbb supabase-vezeto.sql, majd supabase-beosztas.sql.
-4. Nyisd meg: https://kancsalbrine.github.io/dando-app/vezeto.html?v=34
-5. A Beosztás menüben a 13 dolgozó közül Balázs Roland az első sorban szerepel. A háttérben a régi sorazonosítók maradnak, így a meglévő beosztások nem csúsznak el.
-
-Ha még mindig a régi felület látszik, a böngésző webhelyadataiban töröld az adott GitHub Pages oldal gyorsítótárát és a service worker regisztrációját, majd nyisd meg újra a fenti URL-t. A Supabase adatait ez nem törli.
-
-A GitHub kapcsolat nem engedett közvetlen írást, ezért ezt a csomagot manuálisan kell feltölteni.
+**Megjegyzés:** Az Excel-fájl olvasásához a böngésző importáláskor letölti a SheetJS könyvtárat a `cdn.sheetjs.com` címről. Internet nélkül CSV-importot használj. Az import nem képfelismerés; a fényképet előbb Excel/CSV táblázattá kell alakítani. A kód nem módosítja a régi `dando_data` táblát.

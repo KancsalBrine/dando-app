@@ -1,4 +1,4 @@
-import { mountRoster, unmountRoster } from './beosztas.js?v=34';
+import { mountRoster, unmountRoster, workingNow, EMPLOYEES } from './beosztas.js?v=35';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.js';
 
@@ -30,7 +30,7 @@ const tableNames = {
   movements:'manager_stock_movements', orders:'manager_orders'
 };
 const state={view:'home',user:null,loaded:false,loading:false,mode:'',editing:null,editorHandler:null,
-  prefs:null,logs:[],templates:[],checks:[],people:[],products:[],movements:[],orders:[]};
+  rosterEntries:{},rosterMonth:'',rosterError:null,prefs:null,logs:[],templates:[],checks:[],people:[],products:[],movements:[],orders:[]};
 let supabase=null;
 let busy=false;
 function showToast(message){const el=$('toast');el.textContent=message;el.classList.remove('hidden');clearTimeout(showToast.timeout);showToast.timeout=setTimeout(()=>el.classList.add('hidden'),5000)}
@@ -56,6 +56,7 @@ async function loadAll(){
     for(const r of results)if(r.error)throw r.error;
     state.prefs=results[0].data;
     for(const [i,key] of ['logs','templates','checks','people','products','movements','orders'].entries())state[key]=results[i+1].data||[];
+    await loadCurrentRoster();
     state.loaded=true;$('authPanel').classList.add('hidden');$('workspace').classList.remove('hidden');
     $('userLabel').textContent=state.user.email||'';
     setSync(true,'Szinkronizálva',new Date().toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'}));
@@ -92,11 +93,45 @@ function weekKey(dateStr){
 }
 function periodKey(t){return t.cadence==='weekly'?weekKey(today()):today();}
 function checkRecord(t){return state.checks.find(c=>c.template_id===t.id&&c.period_key===periodKey(t));}
+async function loadCurrentRoster(){
+ const month=(liveShift()?.date||today()).slice(0,7);
+ const {data,error}=await supabase.from('manager_rosters').select('entries').eq('user_id',state.user.id).eq('month',month).maybeSingle();
+ state.rosterMonth=month;
+ state.rosterEntries=error?{}:(data?.entries||{});
+ state.rosterError=error?.message||null;
+}
+function liveShift(){
+ const p=state.prefs, now=budapestParts();
+ if(!p?.shift_one_start||!p?.shift_one_end||!p?.shift_two_start||!p?.shift_two_end)return null;
+ const parse=t=>{const [h,m]=toTime(t).split(':').map(Number);return h*60+m;};
+ for(const [code,start,end,label] of [['e',p.shift_one_start,p.shift_one_end,p.shift_one_name||'Első műszak'],['n',p.shift_two_start,p.shift_two_end,p.shift_two_name||'Második műszak']]){
+  const a=parse(start),b=parse(end),overnight=a>b;
+  if(a===b)continue;
+  const active=overnight?(now.minute>=a||now.minute<b):(now.minute>=a&&now.minute<b);
+  if(active){
+   const d=new Date(now.date+'T12:00:00Z');
+   if(overnight&&now.minute<b)d.setUTCDate(d.getUTCDate()-1);
+   const date=d.toISOString().slice(0,10);
+   return {code,label,date};
+  }
+ }
+ return null;
+}
+function workingPanel(){
+ const shift=liveShift();
+ if(!shift)return `<section class="panel"><div class="section-head"><div><h2>Ki dolgozik most?</h2><p>Jelenleg nincs aktív, beállított műszak.</p></div></div><p class="hint">A műszakok időpontját a Beállításokban módosíthatod.</p></section>`;
+ const month=shift.date.slice(0,7);
+ if(month!==state.rosterMonth)return `<section class="panel"><h2>Ki dolgozik most?</h2><p>Az aktuális műszak ${esc(shift.date)} napi beosztását frissítsd a Frissítés gombbal.</p></section>`;
+ if(state.rosterError)return `<section class="panel"><h2>Ki dolgozik most?</h2><p>Nem sikerült lekérni a beosztást: ${esc(state.rosterError)}</p></section>`;
+ const workers=workingNow(state.rosterEntries,shift.date,shift.code);
+ return `<section class="panel"><div class="section-head"><div><h2>Ki dolgozik most?</h2><p>${esc(shift.label)} · ${esc(shift.date)} · Budapest idő szerint</p></div><button class="button quiet small" data-view="roster">Beosztás megnyitása</button></div>${workers.length?`<div class="worker-grid">${workers.map(name=>`<span class="worker-pill">● ${esc(name)}</span>`).join('')}</div><p class="hint">${workers.length} dolgozó beosztva. A „8” jelölést mindkét műszaknál megjelenítjük.</p>`:'<div class="empty">Erre a műszakra még nincs dolgozó beosztva.</div>'}</section>`;
+}
 function dashboard(){
   const active=state.templates.filter(t=>t.enabled);
   const completed=active.filter(t=>checkRecord(t)?.status==='ok').length;
   const latest=state.logs.slice(0,5);
   return `<section class="hero"><span class="eyebrow">VEZETŐHELYETTESI ÁTTEKINTÉS</span><h2>Ma is minden egy helyen.</h2><p>${esc(fmt(today()))} · ${esc(currentShift())}</p></section>
+  ${workingPanel()}
   <div class="metrics"><article class="metric"><span>NYITOTT ESEMÉNY</span><strong>${openLogs().length}</strong><small>Műszaknapló</small></article><article class="metric"><span>ELLENŐRIZVE</span><strong>${completed}/${active.length}</strong><small>Aktuális napi/heti pontok</small></article><article class="metric"><span>KÉSZLETHATÁRON</span><strong>${lowProducts().length}</strong><small>Minimumon vagy az alatt</small></article><article class="metric"><span>RENDELÉS FOLYAMATBAN</span><strong>${state.orders.filter(x=>x.status==='draft'||x.status==='ordered').length}</strong><small>Előkészítve vagy megrendelve</small></article></div>
   <div class="columns"><div class="stack"><section class="panel">${controls('Fontos események','A legutóbbi műszaknapló-bejegyzések','new-log')}${latest.length?`<div class="list-timeline">${latest.map(l=>`<article class="timeline-item"><small>${esc(l.shift_date)} · ${shiftLabel(l.shift_type)}</small><h3>${esc(l.title)} ${l.priority==='urgent'?pill('Sürgős','red'):''}</h3><p>${esc(l.details).slice(0,180)}</p>${pill(logStatus[l.status]||l.status,l.status==='done'?'green':'orange')}</article>`).join('')}</div>`:'<div class="empty">Nincs még műszaknapló-bejegyzés.</div>'}</section></div>
   <div class="stack"><section class="panel">${controls('Figyelmet igényel','Teendők egy helyen','new-product','＋ Termék')}<div>${lowProducts().slice(0,7).map(p=>`<div class="summary-row"><div><strong>${esc(p.name)}</strong><br><small>${num(p.quantity)} ${esc(p.unit)} / min. ${num(p.minimum)}</small></div>${pill('Készlet','red')}</div>`).join('')||'<div class="empty">Nincs készlethatáron lévő termék.</div>'}</div></section>
