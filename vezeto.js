@@ -124,7 +124,7 @@ function workingPanel(){
  if(month!==state.rosterMonth)return `<section class="panel"><h2>Ki dolgozik most?</h2><p>Az aktuális műszak ${esc(shift.date)} napi beosztását frissítsd a Frissítés gombbal.</p></section>`;
  if(state.rosterError)return `<section class="panel"><h2>Ki dolgozik most?</h2><p>Nem sikerült lekérni a beosztást: ${esc(state.rosterError)}</p></section>`;
  const workers=workingNow(state.rosterEntries,shift.date,shift.code);
- return `<section class="panel shift-panel"><div class="section-head"><div><h2>Ki dolgozik most?</h2><p>${esc(shift.label)} · ${esc(shift.date)} · Budapest idő szerint</p></div><button class="button quiet small" data-view="roster">Beosztás megnyitása</button></div>${workers.length?`<div class="worker-grid">${workers.map(name=>`<span class="worker-pill">● ${esc(name)}</span>`).join('')}</div><p class="hint">${workers.length} dolgozó beosztva. A „8” jelölést mindkét műszaknál megjelenítjük.</p>`:'<div class="empty">Erre a műszakra még nincs dolgozó beosztva.</div>'}</section>`;
+ return `<section class="panel shift-panel"><div class="section-head"><div><h2>Ki dolgozik most?</h2><p>${esc(shift.label)} · ${esc(shift.date)} · Budapest idő szerint</p></div></div>${workers.length?`<div class="worker-grid">${workers.map(name=>`<span class="worker-pill">● ${esc(name)}</span>`).join('')}</div><p class="hint">${workers.length} dolgozó beosztva. A „8” jelölés mindkét műszakban szerepel.</p><button class="button quiet small" data-view="roster">Beosztás megnyitása</button>`:'<div class="empty">Erre a műszakra még nincs dolgozó beosztva.</div>'}</section>`;
 }
 function nextShiftPanel(){
  const p=state.prefs;
@@ -168,7 +168,7 @@ function dashboard(){
  <section class="v4-welcome"><div><span class="eyebrow">DANDÓ · VEZETŐI KÖZPONT</span><h2>${greeting} 👋</h2><p>Itt a mai működés összefoglalója. · ${esc(fmt(today()))}</p></div><button class="button v4-refresh" data-action="refresh">↻ Frissítés</button></section>
  <div class="v4-metrics">
   <button class="v4-metric" data-view="logs"><span class="v4-metric-icon">⚠</span><strong>${openLogs().length}</strong><span>Nyitott esemény</span>${urgent.length?`<small>${urgent.length} sürgős</small>`:'<small>Műszaknapló</small>'}</button>
-  <button class="v4-metric" data-view="checks"><span class="v4-metric-icon">☑</span><strong>${completed}/${active.length}</strong><span>Ellenőrizve</span><small>${pending.length} hátralévő</small></button>
+  <button class="v4-metric" data-view="checks"><span class="v4-metric-icon">☑</span><strong>${active.length?`${completed}/${active.length}`:"—"}</strong><span>Ellenőrizve</span><small>${pending.length} hátralévő</small></button>
   <button class="v4-metric" data-view="stock"><span class="v4-metric-icon">⬡</span><strong>${low.length}</strong><span>Készlethatáron</span><small>Minimumon vagy alatta</small></button>
   <button class="v4-metric" data-view="orders"><span class="v4-metric-icon">▣</span><strong>${pendingOrders.length}</strong><span>Folyamatban</span><small>Rendelések</small></button>
  </div>

@@ -1,9 +1,13 @@
-# Dandó V4.4 – mobil javítás
+# Dandó V4.5 – Neon mobil javítás
 
-A ZIP fájljait töltsd fel a GitHub main ág gyökerébe, a meglévőket felülírva. A `supabase-config.js` fájlt ne módosítsd, az nincs a csomagban. Nincs adatbázis-módosítás.
+A V4.4 változatra épül, a Supabase-adatokat és a Továbbiak menü működését megtartja.
 
-Megnyitás: https://kancsalbrine.github.io/dando-app/vezeto.html?v=44
+1. A ZIP teljes tartalmát töltsd fel a `KancsalBrine/dando-app` GitHub-repo `main` ágának gyökerébe.
+2. A meglévő fájlokat írd felül, az új `neon-v45.css` fájlt is töltsd fel.
+3. **A `supabase-config.js` fájlt ne töröld és ne cseréld le.**
+4. Nyisd meg: https://kancsalbrine.github.io/dando-app/vezeto.html?v=45
+5. Ha a PWA régi verziót mutat, zárd be teljesen, nyisd meg újra. Csak a nem szinkronizált helyi adatok ellenőrzése után törölj webhelyadatot.
 
-Javítva: kompakt alulról nyíló Továbbiak menü, 2×2-es statisztikák, kisebb és rendezettebb műszakkártyák, mobil fejléc, gombméretek.
+Javítások: kontrasztos neon kártyaszegélyek és visszafogott fényhatás, kisebb mobil térközök, kompaktabb műszakkártyák, jobban elhelyezett Beosztás gomb, 2×2 statisztikák, az alsó menü változatlan. Ha nincs ellenőrzőlista, 0/0 helyett — jelenik meg.
 
-Ha a korábbi PWA van telepítve, frissítsd vagy telepítsd újra, miután ellenőrizted a Supabase-szinkronizálást. A tényleges mobilos tesztelés a feltöltés után szükséges.
+A tényleges iPhone-os megjelenés telepítés után ellenőrizendő.
