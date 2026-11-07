@@ -16,6 +16,7 @@
       <p class="nav-label">MUNKATERÜLET</p>
       <nav id="nav" aria-label="Főmenü">
         <button type="button" data-view="home" class="nav active"><span>◈</span> Áttekintés</button>
+        <button type="button" data-view="roster" class="nav"><span>▦</span> Beosztás</button>
         <button type="button" data-view="logs" class="nav"><span>▤</span> Műszaknapló</button>
         <button type="button" data-view="checks" class="nav"><span>☑</span> Ellenőrzőlisták</button>
         <button type="button" data-view="stock" class="nav"><span>▧</span> Készlet</button>
@@ -26,7 +27,6 @@
       <div class="side-bottom">
         <div class="sync"><span class="sync-led" id="syncLed"></span><div><b id="syncTitle">Kapcsolódás…</b><small id="syncSubtitle">Supabase</small></div></div>
         <button type="button" class="nav" data-action="export"><span>⇩</span> JSON-export</button>
-        <a class="nav" href="./index.html"><span>⌂</span> Régi Dandó</a>
         <button type="button" class="nav" data-action="logout"><span>⇥</span> Kijelentkezés</button>
       </div>
     </aside>
@@ -36,11 +36,11 @@
         <span class="eyebrow">DANDÓ FELHŐ</span><h2>Jelentkezz be</h2>
         <p>A vezetői modul a meglévő Dandó Supabase-fiókodat használja. Előbb futtasd a csomagban lévő <code>supabase-vezeto.sql</code> fájlt a Supabase SQL Editorban.</p>
         <form id="loginForm" class="form-stack"><label>E-mail-cím<input id="loginEmail" type="email" autocomplete="email" required /></label><label>Jelszó<input id="loginPassword" type="password" autocomplete="current-password" required /></label><button type="submit" class="button primary">Bejelentkezés</button></form>
-        <p class="muted">Ha még nincs fiókod, a régi Dandó felületén hozhatsz létre egyet.</p>
+        <p class="muted">A meglévő Supabase-fiókoddal jelentkezz be.</p>
       </section>
       <div id="errorPanel" class="error-panel hidden" role="alert"></div>
       <div id="workspace" class="hidden"><div id="screen"></div></div>
-      <footer>Dandó · Vezetőhelyettesi modul v3.1 · <span id="userLabel"></span></footer>
+      <footer>Dandó · Vezetőhelyettesi modul v3.2 · <span id="userLabel"></span></footer>
     </main>
   </div>
   <dialog id="editor"><form id="editorForm"><header class="dialog-head"><h2 id="editorTitle">Szerkesztés</h2><button type="button" class="close" data-action="close-dialog" aria-label="Bezárás">×</button></header><div id="editorFields"></div><div class="dialog-buttons"><button type="button" class="button quiet" data-action="close-dialog">Mégse</button><button type="submit" class="button primary" id="editorSave">Mentés</button></div></form></dialog>

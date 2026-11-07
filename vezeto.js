@@ -1,3 +1,4 @@
+import { mountRoster, unmountRoster } from './beosztas.js';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.js';
 
@@ -129,12 +130,14 @@ function renderSettings(){const p=state.prefs||{};return `<section class="panel"
   <section class="panel" style="margin-top:17px"><div class="section-head"><h2>Adatmentés</h2></div><p>Az adatokat a Supabase tárolja. A JSON-export külön biztonsági másolatnak alkalmas. Ha megszakad az internetkapcsolat, ez a verzió <strong>nem állítja, hogy mentett</strong>: hibaüzenetet kapsz, és újra kell próbálnod.</p><button class="button quiet" type="button" data-action="export">⇩ JSON-export letöltése</button></section>`}
 function render(){
   if(!state.loaded)return;
-  const views={home:['Áttekintés',dashboard],logs:['Műszaknapló',renderLogs],checks:['Ellenőrzőlisták',renderChecks],stock:['Készlet',renderStock],orders:['Rendelések',renderOrders],people:['Dolgozók',renderPeople],settings:['Beállítások',renderSettings]};
+  const views={home:['Áttekintés',dashboard],logs:['Műszaknapló',renderLogs],checks:['Ellenőrzőlisták',renderChecks],stock:['Készlet',renderStock],orders:['Rendelések',renderOrders],people:['Dolgozók',renderPeople],settings:['Beállítások',renderSettings],roster:['Havi beosztás',()=>'<div id="rosterRoot"></div>']};
   if(!views[state.view])state.view='home';
   $('screenTitle').textContent=views[state.view][0];
   $('dateLabel').textContent=new Intl.DateTimeFormat('hu-HU',{dateStyle:'full',timeZone:'Europe/Budapest'}).format(new Date()).toUpperCase();
   document.querySelectorAll('.nav[data-view]').forEach(n=>n.classList.toggle('active',n.dataset.view===state.view));
+  if(state.view!=='roster')unmountRoster();
   $('screen').innerHTML=views[state.view][1]();
+  if(state.view==='roster')mountRoster($('rosterRoot'),supabase,state.user);
   if(state.view==='logs')fillLogRows();
 }
 function setView(v){state.view=v;render();window.scrollTo({top:0,behavior:'smooth'})}

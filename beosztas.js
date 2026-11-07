@@ -1,0 +1,30 @@
+// Dandó V3.2: havi beosztás, bejelentkezett felhasználónként a Supabase-ben.
+const EMPLOYEES=['Busai Rita','Kovács Béláné','Szeghalmi Beáta','Váradi Noémi','Sirkó Flóra','Koledich Milán','Petykó Mihályné','Ferov Viktor','Telek Bori','Bartus Tamás','Szűcs Endre','Koledich Csaba'];
+const CODES=['e','n','8','sz','p','x',''];
+const LABELS={'e':'Első műszak','n':'Második műszak','8':'8 óra','sz':'Szabadnap','p':'Egyéb','x':'Távollét','':'Törlés'};
+let generation=0;
+const htmlEscape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function currentMonth(){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Budapest',year:'numeric',month:'2-digit'}).formatToParts(new Date());const v=Object.fromEntries(parts.map(p=>[p.type,p.value]));return `${v.year}-${v.month}`}
+function csvExport(month,data){const [y,m]=month.split('-').map(Number),days=new Date(y,m,0).getDate();const rows=[['Dolgozó',...Array.from({length:days},(_,i)=>String(i+1))],...EMPLOYEES.map((name,i)=>[name,...Array.from({length:days},(_,j)=>data[`${i}-${j+1}`]||'')])];const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`dando-beosztas-${month}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+export async function mountRoster(root,supabase,user){
+ const ticket=++generation;
+ root.innerHTML=`<section class="panel"><div class="section-head"><div><h2>Havi műszakbeosztás</h2><p>12 dolgozó · Balázs Roland nélkül · felhőben mentve</p></div></div><div class="roster-toolbar"><label>Hónap<input id="rosterMonth" type="month" value="${currentMonth()}"></label><label>Jelölés<select id="rosterCode">${CODES.map(c=>`<option value="${c}">${c||'–'} – ${LABELS[c]}</option>`).join('')}</select></label><button class="button quiet" id="rosterCsv">CSV export</button><button class="button quiet" id="rosterPrint">Nyomtatás</button><button class="button danger" id="rosterClear">Hónap ürítése</button></div><p class="hint" id="rosterStatus" role="status">Betöltés…</p><div class="roster-scroll"><table class="roster-table" id="rosterTable"></table></div><div class="roster-legend">🟢 e – első · 🟡 n – második · 🔵 8 – nyolc óra · 🟩 sz – szabad · 🟣 p – egyéb · 🟥 x – távollét</div><p class="hint">A cellák kattintással szerkeszthetők. A mentés csak sikeres Supabase-visszaigazolás után számít késznek. Más eszközön a Frissítés gombbal töltsd újra az adatokat.</p></section>`;
+ const el=id=>root.querySelector('#'+id),status=(message,error=false)=>{const s=el('rosterStatus');if(s){s.textContent=message;s.style.color=error?'#b82e50':''}};
+ let data={},revision=null,loading=false,saving=false;
+ const active=()=>ticket===generation&&root.isConnected;
+ function draw(){if(!active())return;const [y,m]=el('rosterMonth').value.split('-').map(Number);const days=new Date(y,m,0).getDate();let markup='<thead><tr><th class="roster-person">Dolgozó</th>';for(let d=1;d<=days;d++){const wd=new Date(y,m-1,d).getDay();markup+=`<th class="${wd===0||wd===6?'weekend':''}">${d}</th>`}markup+='</tr></thead><tbody>';EMPLOYEES.forEach((name,i)=>{markup+=`<tr><th class="roster-person ${i===8||i===11?'special':''}">${htmlEscape(name)}</th>`;for(let d=1;d<=days;d++){const wd=new Date(y,m-1,d).getDay(),code=data[`${i}-${d}`]||'';markup+=`<td class="roster-day ${wd===0||wd===6?'weekend':''}" data-cell="${i}-${d}" data-code="${code}" tabindex="0" aria-label="${htmlEscape(name)}, ${d}. nap: ${LABELS[code]||'Üres'}">${code}</td>`}markup+='</tr>'});el('rosterTable').innerHTML=markup+'</tbody>'}
+ async function load(){if(!active()||loading||saving)return;loading=true;status('Felhőadatok betöltése…');const month=el('rosterMonth').value;try{const {data:record,error}=await supabase.from('manager_rosters').select('entries,updated_at').eq('user_id',user.id).eq('month',month).maybeSingle();if(error)throw error;if(!active()||el('rosterMonth').value!==month)return;data=record?.entries||{};revision=record?.updated_at||null;draw();status('Felhőből betöltve · '+month)}catch(err){status('Nem sikerült betölteni: '+err.message,true)}finally{loading=false}}
+ async function save(next){if(saving||loading)return;const month=el('rosterMonth').value;saving=true;status('Mentés a felhőbe…');try{
+ // Optimista zárolás: a régebbi állapot nem írhatja felül a másik eszköz friss módosítását.
+ let query;if(revision){query=supabase.from('manager_rosters').update({entries:next}).eq('user_id',user.id).eq('month',month).eq('updated_at',revision).select('updated_at').maybeSingle()}else{query=supabase.from('manager_rosters').insert({user_id:user.id,month,entries:next}).select('updated_at').single()}
+ const {data:record,error}=await query;if(error)throw error;if(!record)throw Error('Másik eszközön változott a beosztás. Frissítsd az oldalt, majd próbáld újra.');if(!active())return;data=next;revision=record.updated_at;draw();status('Sikeresen mentve a felhőbe · '+month)
+ }catch(err){status('Nincs mentve: '+err.message,true)}finally{saving=false}}
+ const changeCell=target=>{const cell=target.closest('[data-cell]');if(!cell||saving||loading)return;const code=el('rosterCode').value;const next={...data};if(code)next[cell.dataset.cell]=code;else delete next[cell.dataset.cell];save(next)};
+ el('rosterTable').addEventListener('click',e=>changeCell(e.target));el('rosterTable').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();changeCell(e.target)}});
+ el('rosterMonth').addEventListener('change',()=>{if(saving){status('Várd meg a mentést!',true);return}data={};revision=null;el('rosterTable').innerHTML='';load()});
+ el('rosterCsv').addEventListener('click',()=>csvExport(el('rosterMonth').value,data));
+ el('rosterPrint').addEventListener('click',()=>window.print());
+ el('rosterClear').addEventListener('click',()=>{if(confirm('Biztosan törlöd a kiválasztott hónap összes beosztását?'))save({})});
+ await load();
+}
+export function unmountRoster(){generation++}
