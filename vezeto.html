@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#6558e8" />
   <meta name="description" content="Dandó – személyes vezetőhelyettesi munkafelület" />
-  <link rel="icon" href="./icon.svg" />
+  <link rel="icon" href="./icon.svg?v=43" />
   <script>
 (function(){
   function applyTheme(){
@@ -17,14 +17,14 @@
 })();
 </script>
 <link rel="stylesheet" href="./vezeto.css" />
-  <link rel="stylesheet" href="./mobile.css?v=42" />
-  <link rel="stylesheet" href="./dark-mode.css?v=42" />
-  <link rel="stylesheet" href="./premium.css?v=42" /><title>Dandó V4.2 – Vezetői központ</title>
+  <link rel="stylesheet" href="./mobile.css?v=43" />
+  <link rel="stylesheet" href="./dark-mode.css?v=43" />
+  <link rel="stylesheet" href="./premium.css?v=43" /><title>Dandó V4.3 – Vezetői központ</title>
 </head>
 <body>
   <div class="shell">
     <aside class="sidebar">
-      <div class="brand"><span class="brand-mark">⛽</span><div><strong>Dandó <em>V4.2</em></strong><small>Vezetői Központ</small></div></div>
+      <div class="brand"><span class="brand-mark"><img src="./icon.svg?v=43" alt="Dandó logó" /></span><div><strong>Dandó <em>V4.3</em></strong><small>Vezetői Központ</small></div></div>
       <p class="nav-label">MUNKATERÜLET</p>
       <nav id="nav" aria-label="Főmenü">
         <button type="button" data-view="home" class="nav active"><span>◈</span> Áttekintés</button>
@@ -41,7 +41,7 @@
         <button type="button" class="nav" data-action="export"><span>⇩</span> JSON-export</button>
         <button type="button" class="nav" data-action="logout"><span>⇥</span> Kijelentkezés</button>
       </div>
-    <div class="sidebar-art" aria-hidden="true">⛽<small>Dandó V4.2</small></div></aside>
+    <div class="sidebar-art" aria-hidden="true">⛽<small>Dandó V4.3</small></div></aside>
     <nav class="mobile-dock" aria-label="Mobil gyorsmenü">
       <button data-view="home"><span>⌂</span>Főoldal</button>
       <button data-view="roster"><span>▦</span>Beosztás</button>
@@ -64,7 +64,7 @@
   </div>
   <dialog id="editor"><form id="editorForm"><header class="dialog-head"><h2 id="editorTitle">Szerkesztés</h2><button type="button" class="close" data-action="close-dialog" aria-label="Bezárás">×</button></header><div id="editorFields"></div><div class="dialog-buttons"><button type="button" class="button quiet" data-action="close-dialog">Mégse</button><button type="submit" class="button primary" id="editorSave">Mentés</button></div></form></dialog>
   <div id="toast" role="status" aria-live="polite" class="toast hidden"></div>
-  <script type="module" src="./vezeto.js?v=42"></script>
+  <script type="module" src="./vezeto.js?v=43"></script>
 <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js?v=42",{updateViaCache:"none"}).catch(()=>{});}</script>
 </body>
 </html>

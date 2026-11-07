@@ -1,8 +1,2 @@
-# Dandó V4.2 – látványtervhez illeszkedő dizájn
-A korábbi V4.1 fájlok felülírásával telepíthető a GitHub main ág gyökerébe.
-**A `supabase-config.js` fájlt hagyd meg, nem szerepel a csomagban.**
-Nem változik a Supabase adatbázis, a műszakbeosztás, a készlet, az ellenőrzések és a napló.
-Nyisd meg: https://kancsalbrine.github.io/dando-app/vezeto.html?v=42
-Az új felület sötétkék oldalsávot, lila kiemeléseket, új főoldali kártyákat, mobil alsó navigációt és automatikus napszakos témát tartalmaz.
-A látványterv illusztratív számait nem másoltuk be: az app a tényleges Supabase-adatokat mutatja.
-A tényleges böngészős működés ellenőrzése feltöltés után szükséges.
+# Dandó V4.3 – új logó
+A ZIP fájljait töltsd fel a GitHub main ág gyökerébe. A `supabase-config.js` maradjon változatlan. Az új üzemanyagkút logó az oldalsávban, a böngésző fülén és a telepített PWA ikonjában is szerepel. A régi PWA-ikon megmaradhat az operációs rendszer ikongyorsítótárában: szükség esetén távolítsd el a telepített alkalmazást, majd telepítsd újra. Az adatok a Supabase-ben maradnak. Megnyitás: https://kancsalbrine.github.io/dando-app/vezeto.html?v=43
