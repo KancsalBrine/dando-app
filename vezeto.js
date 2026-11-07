@@ -1,4 +1,4 @@
-import { mountRoster, unmountRoster } from './beosztas.js?v=33';
+import { mountRoster, unmountRoster } from './beosztas.js?v=34';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.js';
 
