@@ -6,8 +6,19 @@
   <meta name="theme-color" content="#6558e8" />
   <meta name="description" content="Dandó – személyes vezetőhelyettesi munkafelület" />
   <link rel="icon" href="./icon.svg" />
-  <link rel="stylesheet" href="./vezeto.css" />
-  <link rel="stylesheet" href="./mobile.css?v=40" />
+  <script>
+(function(){
+  function applyTheme(){
+    const hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Budapest',hour:'2-digit',hourCycle:'h23'}).format(new Date()));
+    document.documentElement.dataset.theme=(hour>=19||hour<7)?'dark':'light';
+  }
+  applyTheme();setInterval(applyTheme,60000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)applyTheme();});
+})();
+</script>
+<link rel="stylesheet" href="./vezeto.css" />
+  <link rel="stylesheet" href="./mobile.css?v=41" />
+  <link rel="stylesheet" href="./dark-mode.css?v=41" />
   <title>Dandó – Vezetői központ</title>
 </head>
 <body>
@@ -41,12 +52,12 @@
       </section>
       <div id="errorPanel" class="error-panel hidden" role="alert"></div>
       <div id="workspace" class="hidden"><div id="screen"></div></div>
-      <footer>Dandó · Vezetőhelyettesi modul v4.0 · <span id="userLabel"></span></footer>
+      <footer>Dandó · Vezetőhelyettesi modul v3.2 · <span id="userLabel"></span></footer>
     </main>
   </div>
   <dialog id="editor"><form id="editorForm"><header class="dialog-head"><h2 id="editorTitle">Szerkesztés</h2><button type="button" class="close" data-action="close-dialog" aria-label="Bezárás">×</button></header><div id="editorFields"></div><div class="dialog-buttons"><button type="button" class="button quiet" data-action="close-dialog">Mégse</button><button type="submit" class="button primary" id="editorSave">Mentés</button></div></form></dialog>
   <div id="toast" role="status" aria-live="polite" class="toast hidden"></div>
-  <script type="module" src="./vezeto.js?v=40"></script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js?v=36",{updateViaCache:"none"}).catch(()=>{});}</script>
+  <script type="module" src="./vezeto.js?v=41"></script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js?v=41",{updateViaCache:"none"}).catch(()=>{});}</script>
 </body>
 </html>

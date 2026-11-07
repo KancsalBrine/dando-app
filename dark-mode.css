@@ -1,0 +1,33 @@
+/* Dandó V4.1 – automatikus, Budapest-időzónás éjszakai téma */
+html[data-theme="dark"] { color-scheme:dark; --bg:#11131c;--surface:#1b2030;--surface-alt:#252b3d;--text:#f0f2fb;--muted:#aab3ca;--line:#394156;--accent:#a69cff;--accent-strong:#c0b8ff;--soft:#343052;--green:#64d5a0;--orange:#f5bd70;--red:#ff8ca5;--shadow:0 10px 32px #0005; }
+html[data-theme="dark"] body {background:var(--bg);color:var(--text)}
+html[data-theme="dark"] .sidebar,html[data-theme="dark"] .panel,html[data-theme="dark"] .metric,html[data-theme="dark"] .v4-metric,html[data-theme="dark"] dialog {background:var(--surface);color:var(--text)}
+html[data-theme="dark"] .nav.active,html[data-theme="dark"] .nav:hover {background:var(--soft);color:var(--accent-strong)}
+html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea {background:#252b3d;color:var(--text);border-color:var(--line)}
+html[data-theme="dark"] input::placeholder,html[data-theme="dark"] textarea::placeholder {color:#aab3ca}
+html[data-theme="dark"] .product-card,html[data-theme="dark"] .timeline-item,html[data-theme="dark"] .note,html[data-theme="dark"] .sync,html[data-theme="dark"] .v4-actions button {background:var(--surface-alt);color:var(--text)}
+html[data-theme="dark"] .worker-pill {background:#302d55;border-color:#55518a;color:#e6e1ff}
+html[data-theme="dark"] .roster-table thead th {background:#30374b;color:#f3f4ff}
+html[data-theme="dark"] .roster-table th.roster-person {background:#4d4629;color:#fff1b9}
+html[data-theme="dark"] .roster-table th.roster-person.special {background:#49315e;color:#f6e6ff}
+html[data-theme="dark"] .roster-table thead th.weekend {background:#8e7220;color:#fff8db}
+html[data-theme="dark"] .roster-table td.weekend {background:#3b3524;color:#f8e8b4}
+html[data-theme="dark"] .roster-table th,html[data-theme="dark"] .roster-table td {border-color:#495067}
+html[data-theme="dark"] .roster-day[data-code="e"] {background:#174e3b;color:#a4f5cc}
+html[data-theme="dark"] .roster-day[data-code="n"] {background:#5b4c23;color:#ffeba0}
+html[data-theme="dark"] .roster-day[data-code="8"] {background:#223f65;color:#bbdcff}
+html[data-theme="dark"] .roster-day[data-code="sz"] {background:#24754d;color:#fff}
+html[data-theme="dark"] .roster-day[data-code="p"] {background:#70418d;color:#fff}
+html[data-theme="dark"] .roster-day[data-code="x"] {background:#713543;color:#ffd2da}
+html[data-theme="dark"] .roster-scroll {border-color:var(--line)}
+html[data-theme="dark"] .data-table th {background:#252b3d;color:#e9edfb}
+html[data-theme="dark"] .data-table td {border-color:var(--line)}
+html[data-theme="dark"] .pill {border-color:var(--line)}
+html[data-theme="dark"] .v4-welcome {background:linear-gradient(120deg,#30265d,#4e418c)}
+html[data-theme="dark"] .v4-refresh {color:white;border-color:#ffffff55}
+html[data-theme="dark"] .error-panel {background:#462533;border-color:#7d4356;color:#ffd5e0}
+html[data-theme="dark"] .toast {background:#333c55;color:white}
+html[data-theme="dark"] .mini-button,html[data-theme="dark"] .button.quiet {background:#2b3245;color:#f0f2fb;border-color:#4b536a}
+html[data-theme="dark"] .mini-button.picked {background:#1b503e;color:#b9ffda;border-color:#398667}
+html[data-theme="dark"] .mini-button.problem {background:#5d2c3c;color:#ffd1db;border-color:#94485d}
+@media print {html[data-theme="dark"] {color-scheme:light;--bg:#fff;--surface:#fff;--text:#222;--muted:#555;--line:#ccc}html[data-theme="dark"] body {background:#fff;color:#222}}

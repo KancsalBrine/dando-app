@@ -1,21 +1,11 @@
-# Dandó V4 – vezetői főoldal
+# Dandó V4.1 – automatikus sötét mód
 
-A V3.6 meglévő vezetői felületére épül, és **nem változtat az adatbázis sémáján**.
+Töltsd fel a ZIP összes fájlját a `KancsalBrine/dando-app` GitHub tároló `main` ágának gyökerébe, az azonos nevű fájlokat felülírva.
 
-1. GitHub: `KancsalBrine/dando-app`, `main` ág. A csomag tartalmát a repó gyökerébe töltsd fel, a meglévő fájlokat felülírva.
-2. **A `supabase-config.js` fájlt ne töröld és ne cseréld le!** A ZIP nem tartalmazza.
-3. Nem kell Supabase SQL-t futtatni.
-4. Nyisd meg: https://kancsalbrine.github.io/dando-app/vezeto.html?v=40
-5. Mobilon a telepített PWA-t zárd be és indítsd újra. Ha régi verzió látszik, előbb ellenőrizd, hogy az adatok szinkronizálódtak, majd szükség esetén telepítsd újra.
+**Ne töröld vagy írd felül a `supabase-config.js` fájlt.** A ZIP nem tartalmazza. Nem szükséges SQL-t futtatni.
 
-## Újdonságok
-- Frissített, mobilra is optimalizált főoldal.
-- Aktuális és következő műszak dolgozói, a beállított műszakidők és a havi beosztás alapján.
-- Nyitott és sürgős naplóesemények, hiányzó ellenőrzések, készlethiányok, folyamatban lévő rendelések.
-- Kattintható statisztikák és gyorsműveletek.
+A téma Europe/Budapest időzóna szerint 19:00 és 07:00 között sötét, 07:00 és 19:00 között világos. Nyitott oldalon percenként ellenőrzi az időt, és visszatéréskor is frissít.
 
-## Korlátok
-- A következő műszak dolgozóinak listája csak akkor jelenik meg, ha annak hónapja már be van töltve. Hónapváltáskor a Beosztás menüben ellenőrizd a megfelelő hónapot.
-- Az „8” jelölés mindkét műszakban megjelenik, mivel nem tartalmaz kezdési időt.
-- Az aktuális idő megjelenítése az oldal újratöltésekor frissül, nem folyamatos élő követés.
-- A kódot statikusan ellenőriztük; a tényleges Supabase- és mobilböngészős működést telepítés után kell kipróbálni.
+Teszt: https://kancsalbrine.github.io/dando-app/vezeto.html?v=41
+
+Ha a telepített PWA a régi verziót mutatja, zárd be teljesen és indítsd újra. A gyorsítótár törlése előtt ellenőrizd a nem szinkronizált helyi adatokat.
