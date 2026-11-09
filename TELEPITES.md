@@ -1,7 +1,9 @@
-# Dandó V4.6 – műszakkártyák
-A V4.5-re épülő teljes csomag. Töltsd fel a ZIP tartalmát a GitHub `main` ág gyökerébe, a meglévő fájlokat felülírva.
-A `supabase-config.js` fájlt ne módosítsd; nincs a ZIP-ben. Nem kell adatbázis-migráció.
-Az új `shift-cards-v46.css` fájlt is töltsd fel.
-Nyisd meg: https://kancsalbrine.github.io/dando-app/vezeto.html?v=46
+# Dandó V4.8 – 8 órás dolgozók javítása
 
-A műszakok a valódi Supabase-beosztást és a beállított műszakidőket használják. A „Továbbiak” menü változatlan. A zöld jelzés beosztást jelent, nem GPS-es vagy tényleges jelenlét-ellenőrzést.
+A `8` beosztáskódú dolgozók ezentúl csak a nappalos (első, `e`) műszaknál jelennek meg a főoldalon, éjszakás (`n`) műszaknál nem. A korábbi beosztások és a Supabase-adatok nem változnak.
+
+A ZIP minden szükséges alkalmazásfájlt tartalmaz, kivéve a személyes `supabase-config.js` konfigurációt. Töltsd fel a ZIP tartalmát a GitHub `main` ág gyökerébe, felülírva a meglévő fájlokat. A `supabase-config.js` fájlt hagyd változatlanul.
+
+Nyisd meg: https://kancsalbrine.github.io/dando-app/vezeto.html?v=48
+
+Fontos: a javítás az `e` kódot tekinti nappalosnak és az `n` kódot éjszakásnak. A 8 órás dolgozók továbbra is a napi 8 órás kóddal szerepelnek a beosztásban.

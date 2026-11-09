@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#6558e8" />
   <meta name="description" content="Dandó – személyes vezetőhelyettesi munkafelület" />
-  <link rel="icon" href="./icon.svg?v=45" />
+  <link rel="icon" type="image/svg+xml" href="./icon.svg?v=48" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=48" />
+  <link rel="manifest" href="./manifest.webmanifest?v=48" />
   <script>
 (function(){
   function applyTheme(){
@@ -19,12 +21,12 @@
 <link rel="stylesheet" href="./vezeto.css" />
   <link rel="stylesheet" href="./mobile.css?v=45" />
   <link rel="stylesheet" href="./dark-mode.css?v=45" />
-  <link rel="stylesheet" href="./premium.css?v=45" /><link rel="stylesheet" href="./mobile-fix.css?v=45" /><link rel="stylesheet" href="./neon-v45.css?v=46" /><title>Dandó V4.5 – Vezetői központ</title>
+  <link rel="stylesheet" href="./premium.css?v=45" /><link rel="stylesheet" href="./mobile-fix.css?v=45" /><link rel="stylesheet" href="./neon-v45.css?v=46" /><title>Dandó V4.8 – Vezetői központ</title>
 <link rel="stylesheet" href="./shift-cards-v46.css?v=46" /></head>
 <body>
   <div class="shell">
     <aside class="sidebar">
-      <div class="brand"><span class="brand-mark"><img src="./icon.svg?v=45" alt="Dandó logó" /></span><div><strong>Dandó <em>V4.5</em></strong><small>Vezetői Központ</small></div></div>
+      <div class="brand"><span class="brand-mark"><img src="./icon.svg?v=48" alt="Dandó logó" /></span><div><strong>Dandó <em>V4.8</em></strong><small>Vezetői Központ</small></div></div>
       <p class="nav-label">MUNKATERÜLET</p>
       <nav id="nav" aria-label="Főmenü">
         <button type="button" data-view="home" class="nav active"><span>◈</span> Áttekintés</button>
@@ -41,7 +43,7 @@
         <button type="button" class="nav" data-action="export"><span>⇩</span> JSON-export</button>
         <button type="button" class="nav" data-action="logout"><span>⇥</span> Kijelentkezés</button>
       </div>
-    <div class="sidebar-art" aria-hidden="true">⛽<small>Dandó V4.5</small></div></aside>
+    <div class="sidebar-art" aria-hidden="true">⛽<small>Dandó V4.8</small></div></aside>
     <div class="mobile-menu-backdrop" data-action="mobile-close" aria-hidden="true"></div>
     <section class="mobile-menu-sheet" id="mobileMenu" aria-label="További menüpontok" aria-hidden="true">
       <div class="mobile-menu-head"><strong>Továbbiak</strong><button type="button" data-action="mobile-close" aria-label="Menü bezárása">✕</button></div>
@@ -72,12 +74,12 @@
       </section>
       <div id="errorPanel" class="error-panel hidden" role="alert"></div>
       <div id="workspace" class="hidden"><div id="screen"></div></div>
-      <footer>Dandó · Vezetői központ v4.5 · <span id="userLabel"></span></footer>
+      <footer>Dandó · Vezetői központ v4.7 · <span id="userLabel"></span></footer>
     </main>
   </div>
   <dialog id="editor"><form id="editorForm"><header class="dialog-head"><h2 id="editorTitle">Szerkesztés</h2><button type="button" class="close" data-action="close-dialog" aria-label="Bezárás">×</button></header><div id="editorFields"></div><div class="dialog-buttons"><button type="button" class="button quiet" data-action="close-dialog">Mégse</button><button type="submit" class="button primary" id="editorSave">Mentés</button></div></form></dialog>
   <div id="toast" role="status" aria-live="polite" class="toast hidden"></div>
-  <script type="module" src="./vezeto.js?v=46"></script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js?v=46",{updateViaCache:"none"}).catch(()=>{});}</script>
+  <script type="module" src="./vezeto.js?v=48"></script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js?v=48",{updateViaCache:"none"}).catch(()=>{});}</script>
 </body>
 </html>

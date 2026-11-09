@@ -8,11 +8,12 @@ export function currentMonth(){const parts=new Intl.DateTimeFormat('en-GB',{time
 function csvExport(month,data){const [y,m]=month.split('-').map(Number),days=new Date(y,m,0).getDate();const rows=[['Dolgozó',...Array.from({length:days},(_,i)=>String(i+1))],...EMPLOYEES.map((name,i)=>[name,...Array.from({length:days},(_,j)=>data[`${i}-${j+1}`]||'')])];const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`dando-beosztas-${month}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 
 // A régi beosztások indexei változatlanok: Roland a 12-es indexen van.
+// A 8 órás beosztás kizárólag az első (nappalos, e) műszakban jelenik meg.
 export function workingNow(entries, date, shiftCode){
  const day=Number(date.slice(-2));
  return EMPLOYEES.filter((_,i)=>{
   const code=entries?.[`${i}-${day}`];
-  return code===shiftCode || code==='8';
+  return code===shiftCode || (code==='8' && shiftCode==='e');
  });
 }
 function normalizedName(value){return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('hu-HU').replace(/[^a-z0-9]/g,'');}

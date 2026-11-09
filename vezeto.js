@@ -1,4 +1,4 @@
-import { mountRoster, unmountRoster, workingNow, EMPLOYEES } from './beosztas.js?v=42';
+import { mountRoster, unmountRoster, workingNow, EMPLOYEES } from './beosztas.js?v=48';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.js';
 
@@ -117,13 +117,19 @@ function liveShift(){
  }
  return null;
 }
-function shiftIcon(code){return code==='e'?'☀':'☾'}
+// A napszakot a tényleges kezdési idő határozza meg, nem az 'e'/'n' kód.
+function shiftIsDay(start){
+ const [h,m]=toTime(start).split(':').map(Number);
+ const minutes=h*60+m;
+ return minutes>=6*60&&minutes<18*60;
+}
+function shiftIcon(start){return shiftIsDay(start)?'☀':'☾'}
 function shiftPeople(workers,active){
  return `<div class="shift-people">${workers.map((name,i)=>`<div class="shift-person"><span class="shift-avatar ${active?'on':''}" aria-hidden="true">♟</span><span class="shift-person-name">${esc(name)}</span>${active?'<span class="shift-online" title="Beosztva az aktuális műszakra"></span>':''}</div>`).join('')}</div>`;
 }
 function shiftCardHeader(title,label,code,date,start,end,countdown){
  return `<div class="shift-card-head"><h2>${title}</h2><span class="shift-badge ${countdown?'upcoming':'active'}">${countdown?'Hamarosan':'Aktuális műszak'}</span></div>
- <div class="shift-card-time"><span class="shift-symbol ${code==='e'?'moon':'sun'}" aria-hidden="true">${shiftIcon(code)}</span><div class="shift-time-text"><strong>${esc(label)}</strong><small>${esc(start)}–${esc(end)} · ${esc(date)}</small></div>${countdown?`<span class="shift-countdown"><small>Kezdés:</small><strong>${esc(countdown)}</strong></span>`:''}</div>`;
+ <div class="shift-card-time"><span class="shift-symbol ${shiftIsDay(start)?'sun':'moon'}" aria-hidden="true">${shiftIcon(start)}</span><div class="shift-time-text"><strong>${esc(label)}</strong><small>${esc(start)}–${esc(end)} · ${esc(date)}</small></div>${countdown?`<span class="shift-countdown"><small>Kezdés:</small><strong>${esc(countdown)}</strong></span>`:''}</div>`;
 }
 function workingPanel(){
  const shift=liveShift();
