@@ -1,0 +1,32 @@
+/* Dandó V5.0 – mobilos beosztás és alapértelmezett zárolás */
+.roster-panel{min-width:0}
+.roster-lockbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;margin:12px 0 15px;border:1px solid #7653bd70;border-radius:14px;background:linear-gradient(110deg,#6f40c91c,#203b7818)}
+.roster-lockinfo{display:flex;flex-direction:column;gap:5px;min-width:0}
+.roster-lockinfo strong{font-size:14px;color:var(--text)}
+.roster-lockinfo small{font-size:12px;color:var(--muted)}
+.roster-lockbar button{flex-shrink:0;min-height:43px}
+.roster-panel:not(.roster-editing) .roster-day{cursor:default;touch-action:pan-x pan-y}
+.roster-panel:not(.roster-editing) .roster-day:focus{outline:none}
+.roster-panel.roster-editing .roster-lockbar{border-color:#a86aff;background:#7447e620;box-shadow:0 0 17px #9e65ff2b}
+.roster-panel.roster-editing .roster-day{cursor:pointer}
+.roster-panel .roster-toolbar :disabled{opacity:.45;cursor:not-allowed}
+.roster-panel .roster-scroll{max-width:100%;overflow:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.roster-panel .roster-table th.roster-person{box-shadow:3px 0 8px #0002}
+@media(max-width:800px){
+ .roster-panel{padding:13px!important}
+ .roster-lockbar{flex-direction:column;align-items:stretch;padding:12px;gap:11px}
+ .roster-lockbar button{width:100%;font-size:13px}
+ .roster-panel .roster-toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .roster-panel .roster-toolbar label{min-width:0!important;width:100%}
+ .roster-panel .roster-toolbar label:has(input[type="file"]){grid-column:1/-1}
+ .roster-panel .roster-toolbar input[type="file"]{width:100%;max-width:100%}
+ .roster-panel .roster-toolbar button{width:100%;min-height:42px;font-size:12px}
+ .roster-panel .roster-toolbar #rosterClear{grid-column:1/-1}
+ .roster-panel .roster-scroll{max-height:65dvh;border-radius:12px}
+ .roster-panel .roster-table th.roster-person{min-width:116px!important;max-width:116px!important;width:116px!important;white-space:normal!important;line-height:1.2;font-size:11px;padding:5px 6px!important}
+ .roster-panel .roster-table td,.roster-panel .roster-table thead th:not(.roster-person){min-width:42px;height:44px;font-size:12px}
+ .roster-panel .roster-legend{line-height:1.9}
+ .roster-panel .roster-lockinfo strong{font-size:13px}
+}
+@media(max-width:370px){.roster-panel .roster-table th.roster-person{min-width:104px!important;max-width:104px!important;width:104px!important}}
+@media print{.roster-lockbar{display:none!important}}

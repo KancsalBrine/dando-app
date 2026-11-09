@@ -75,23 +75,33 @@ async function readScheduleFile(file){
 
 export async function mountRoster(root,supabase,user){
  const ticket=++generation;
- root.innerHTML=`<section class="panel"><div class="section-head"><div><h2>Havi műszakbeosztás</h2><p>13 dolgozó · Balázs Roland az első sorban · felhőben mentve</p></div></div><div class="roster-toolbar"><label>Hónap<input id="rosterMonth" type="month" value="${currentMonth()}"></label><label>Jelölés<select id="rosterCode">${CODES.map(c=>`<option value="${c}">${c||'–'} – ${LABELS[c]}</option>`).join('')}</select></label><label>Beosztás importálása (Excel/CSV)<input id="rosterImport" type="file" accept=".csv,.xlsx,.xls" /></label><button class="button quiet" id="rosterCsv">CSV export</button><button class="button quiet" id="rosterPrint">Nyomtatás</button><button class="button danger" id="rosterClear">Hónap ürítése</button></div><p class="hint" id="rosterStatus" role="status">Betöltés…</p><div class="roster-scroll"><table class="roster-table" id="rosterTable"></table></div><div class="roster-legend">🌙 e – éjszakás · ☀️ n – nappalos · 🔵 8 – nyolc óra · 🟩 sz – szabad · 🟣 p – egyéb · 🟥 x – távollét</div><p class="hint">A cellák kattintással szerkeszthetők. A mentés csak sikeres Supabase-visszaigazolás után számít késznek. Más eszközön a Frissítés gombbal töltsd újra az adatokat.</p></section>`;
+ root.innerHTML=`<section class="panel roster-panel"><div class="section-head"><div><h2>Havi műszakbeosztás</h2><p>13 dolgozó · Balázs Roland az első sorban · felhőben mentve</p></div></div><div class="roster-lockbar"><div class="roster-lockinfo"><strong id="rosterModeTitle">🔒 Megtekintési mód</strong><small id="rosterModeHint">A beosztás zárolva van, érintésre nem változik.</small></div><button type="button" class="button primary" id="rosterToggleEdit">✎ Szerkesztés bekapcsolása</button></div><div class="roster-toolbar"><label>Hónap<input id="rosterMonth" type="month" value="${currentMonth()}"></label><label>Jelölés<select id="rosterCode">${CODES.map(c=>`<option value="${c}">${c||'–'} – ${LABELS[c]}</option>`).join('')}</select></label><label>Beosztás importálása (Excel/CSV)<input id="rosterImport" type="file" accept=".csv,.xlsx,.xls" /></label><button class="button quiet" id="rosterCsv">CSV export</button><button class="button quiet" id="rosterPrint">Nyomtatás</button><button class="button danger" id="rosterClear">Hónap ürítése</button></div><p class="hint" id="rosterStatus" role="status">Betöltés…</p><div class="roster-scroll"><table class="roster-table" id="rosterTable"></table></div><div class="roster-legend">🌙 e – éjszakás · ☀️ n – nappalos · 🔵 8 – nyolc óra · 🟩 sz – szabad · 🟣 p – egyéb · 🟥 x – távollét</div><p class="hint">Alapértelmezetten zárolva. A cellák csak a külön bekapcsolt szerkesztő módban módosíthatók. Minden módosítás Supabase-mentést igényel; sikertelen mentés esetén az eredeti érték marad.</p></section>`;
  const el=id=>root.querySelector('#'+id),status=(message,error=false)=>{const s=el('rosterStatus');if(s){s.textContent=message;s.style.color=error?'#b82e50':''}};
- let data={},revision=null,loading=false,saving=false;
+ let data={},revision=null,loading=false,saving=false,editing=false;
  const active=()=>ticket===generation&&root.isConnected;
- function draw(){if(!active())return;const [y,m]=el('rosterMonth').value.split('-').map(Number);const days=new Date(y,m,0).getDate();let markup='<thead><tr><th class="roster-person">Dolgozó</th>';for(let d=1;d<=days;d++){const wd=new Date(y,m-1,d).getDay();markup+=`<th class="${wd===0||wd===6?'weekend':''}">${d}</th>`}markup+='</tr></thead><tbody>';EMPLOYEES.map((name,i)=>({name,i})).sort((a,b)=>a.name==='Balázs Roland'?-1:b.name==='Balázs Roland'?1:a.i-b.i).forEach(({name,i})=>{markup+=`<tr><th class="roster-person ${i===8||i===11||i===12?'special':''}">${htmlEscape(name)}</th>`;for(let d=1;d<=days;d++){const wd=new Date(y,m-1,d).getDay(),code=data[`${i}-${d}`]||'';markup+=`<td class="roster-day ${wd===0||wd===6?'weekend':''}" data-cell="${i}-${d}" data-code="${code}" tabindex="0" aria-label="${htmlEscape(name)}, ${d}. nap: ${LABELS[code]||'Üres'}">${code}</td>`}markup+='</tr>'});el('rosterTable').innerHTML=markup+'</tbody>'}
+ function setEditing(value){
+  if(saving||loading){status('Várd meg a betöltés vagy mentés végét!',true);return;}
+  editing=Boolean(value);
+  root.classList.toggle('roster-editing',editing);
+  el('rosterModeTitle').textContent=editing?'✎ Szerkesztő mód':'🔒 Megtekintési mód';
+  el('rosterModeHint').textContent=editing?'A cellák módosíthatók, a változások felhőbe mentődnek.':'A beosztás zárolva van, érintésre nem változik.';
+  el('rosterToggleEdit').textContent=editing?'🔒 Szerkesztés befejezése':'✎ Szerkesztés bekapcsolása';
+  for(const id of ['rosterCode','rosterImport','rosterClear'])el(id).disabled=!editing;
+  draw();
+ }
+ function draw(){if(!active())return;const [y,m]=el('rosterMonth').value.split('-').map(Number);const days=new Date(y,m,0).getDate();let markup='<thead><tr><th class="roster-person">Dolgozó</th>';for(let d=1;d<=days;d++){const wd=new Date(y,m-1,d).getDay();markup+=`<th class="${wd===0||wd===6?'weekend':''}">${d}</th>`}markup+='</tr></thead><tbody>';EMPLOYEES.map((name,i)=>({name,i})).sort((a,b)=>a.name==='Balázs Roland'?-1:b.name==='Balázs Roland'?1:a.i-b.i).forEach(({name,i})=>{markup+=`<tr><th class="roster-person ${i===8||i===11||i===12?'special':''}">${htmlEscape(name)}</th>`;for(let d=1;d<=days;d++){const wd=new Date(y,m-1,d).getDay(),code=data[`${i}-${d}`]||'';markup+=`<td class="roster-day ${wd===0||wd===6?'weekend':''}" data-cell="${i}-${d}" data-code="${code}" tabindex="${editing?0:-1}" aria-readonly="${!editing}" aria-label="${htmlEscape(name)}, ${d}. nap: ${LABELS[code]||'Üres'}">${code}</td>`}markup+='</tr>'});el('rosterTable').innerHTML=markup+'</tbody>'}
  async function load(){if(!active()||loading||saving)return;loading=true;status('Felhőadatok betöltése…');const month=el('rosterMonth').value;try{const {data:record,error}=await supabase.from('manager_rosters').select('entries,updated_at').eq('user_id',user.id).eq('month',month).maybeSingle();if(error)throw error;if(!active()||el('rosterMonth').value!==month)return;data=record?.entries||{};revision=record?.updated_at||null;draw();status('Felhőből betöltve · '+month)}catch(err){status('Nem sikerült betölteni: '+err.message,true)}finally{loading=false}}
- async function save(next){if(saving||loading)return;const month=el('rosterMonth').value;saving=true;status('Mentés a felhőbe…');try{
+ async function save(next){if(!editing){status('A beosztás zárolva van. Előbb kapcsold be a szerkesztést!',true);return;}if(saving||loading)return;const month=el('rosterMonth').value;saving=true;status('Mentés a felhőbe…');try{
  // Optimista zárolás: a régebbi állapot nem írhatja felül a másik eszköz friss módosítását.
  let query;if(revision){query=supabase.from('manager_rosters').update({entries:next}).eq('user_id',user.id).eq('month',month).eq('updated_at',revision).select('updated_at').maybeSingle()}else{query=supabase.from('manager_rosters').insert({user_id:user.id,month,entries:next}).select('updated_at').single()}
  const {data:record,error}=await query;if(error)throw error;if(!record)throw Error('Másik eszközön változott a beosztás. Frissítsd az oldalt, majd próbáld újra.');if(!active())return;data=next;revision=record.updated_at;draw();status('Sikeresen mentve a felhőbe · '+month)
  }catch(err){status('Nincs mentve: '+err.message,true)}finally{saving=false}}
- const changeCell=target=>{const cell=target.closest('[data-cell]');if(!cell||saving||loading)return;const code=el('rosterCode').value;const next={...data};if(code)next[cell.dataset.cell]=code;else delete next[cell.dataset.cell];save(next)};
+ const changeCell=target=>{const cell=target.closest('[data-cell]');if(!cell||!editing||saving||loading)return;const code=el('rosterCode').value;const next={...data};if(code)next[cell.dataset.cell]=code;else delete next[cell.dataset.cell];save(next)};
  el('rosterTable').addEventListener('click',e=>changeCell(e.target));el('rosterTable').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();changeCell(e.target)}});
  el('rosterMonth').addEventListener('change',()=>{if(saving){status('Várd meg a mentést!',true);return}data={};revision=null;el('rosterTable').innerHTML='';load()});
  el('rosterImport').addEventListener('change',async e=>{
   const file=e.target.files?.[0];if(!file)return;
-  if(saving||loading){status('Várd meg a folyamatban lévő műveletet!',true);return;}
+  if(!editing){status('Importáláshoz kapcsold be a szerkesztést!',true);e.target.value='';return;}if(saving||loading){status('Várd meg a folyamatban lévő műveletet!',true);return;}
   const month=el('rosterMonth').value;
   try{
    status('Importálás ellenőrzése…');
@@ -111,7 +121,9 @@ export async function mountRoster(root,supabase,user){
  });
  el('rosterCsv').addEventListener('click',()=>csvExport(el('rosterMonth').value,data));
  el('rosterPrint').addEventListener('click',()=>window.print());
- el('rosterClear').addEventListener('click',()=>{if(confirm('Biztosan törlöd a kiválasztott hónap összes beosztását?'))save({})});
+ el('rosterClear').addEventListener('click',()=>{if(!editing)return;if(confirm('FIGYELEM! A kiválasztott hónap TELJES beosztása törlődik. Biztosan folytatod?'))save({})});
+ el('rosterToggleEdit').addEventListener('click',()=>setEditing(!editing));
+ setEditing(false);
  await load();
 }
 export function unmountRoster(){generation++}
