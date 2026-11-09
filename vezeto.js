@@ -1,4 +1,4 @@
-import { mountRoster, unmountRoster, workingNow, EMPLOYEES } from './beosztas.js?v=48';
+import { mountRoster, unmountRoster, workingNow, EMPLOYEES } from './beosztas.js?v=49';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.js';
 
@@ -73,13 +73,13 @@ async function write(operation,success='Mentve'){
 }
 function controls(title,caption,action,label='＋ Új'){return `<div class="section-head"><div><h2>${title}</h2>${caption?`<p>${caption}</p>`:''}</div><button type="button" class="button primary small" data-action="${action}">${label}</button></div>`}
 function pill(text,type=''){return `<span class="pill ${type}">${esc(text)}</span>`}
-function shiftLabel(shift){return shift==='one'?esc(state.prefs?.shift_one_name||'Délelőtt'):esc(state.prefs?.shift_two_name||'Délután')}
+function shiftLabel(shift){const item=shift==='one'?state.prefs?.shift_one_start:state.prefs?.shift_two_start;return item?(shiftIsDay(item)?'Nappalos':'Éjszakás'):'Műszak'}
 function currentShift(){
   const p=state.prefs;
   if(!p||!p.shift_one_start||!p.shift_one_end||!p.shift_two_start||!p.shift_two_end)return 'A műszakidők még nincsenek beállítva';
   const min=budapestParts().minute;
   const isInside=(a,b)=>{const from=Number(toTime(a).slice(0,2))*60+Number(toTime(a).slice(3,5)),to=Number(toTime(b).slice(0,2))*60+Number(toTime(b).slice(3,5));return from<to ? min>=from&&min<to : min>=from||min<to;};
-  return isInside(p.shift_one_start,p.shift_one_end)?p.shift_one_name:isInside(p.shift_two_start,p.shift_two_end)?p.shift_two_name:'Jelenleg egyik megadott műszak sem aktív';
+  return isInside(p.shift_one_start,p.shift_one_end)?(shiftIsDay(p.shift_one_start)?'Nappalos':'Éjszakás'):isInside(p.shift_two_start,p.shift_two_end)?(shiftIsDay(p.shift_two_start)?'Nappalos':'Éjszakás'):'Jelenleg egyik megadott műszak sem aktív';
 }
 function lowProducts(){return state.products.filter(p=>Number(p.quantity)<=Number(p.minimum));}
 function openLogs(){return state.logs.filter(l=>l.status!=='done');}
@@ -100,11 +100,23 @@ async function loadCurrentRoster(){
  state.rosterEntries=error?{}:(data?.entries||{});
  state.rosterError=error?.message||null;
 }
+// e = éjszakás, n = nappalos, 8 = kizárólag nappalos.
+// A műszakok sorrendjét a beállított kezdési idő határozza meg, nem a mező sorszáma.
+function configuredShifts(){
+ const p=state.prefs||{};
+ return [
+  {start:p.shift_one_start,end:p.shift_one_end},
+  {start:p.shift_two_start,end:p.shift_two_end}
+ ].filter(s=>s.start&&s.end).map(s=>{
+  const day=shiftIsDay(s.start);
+  return {code:day?'n':'e',start:s.start,end:s.end,label:day?'Nappalos':'Éjszakás'};
+ });
+}
 function liveShift(){
  const p=state.prefs, now=budapestParts();
  if(!p?.shift_one_start||!p?.shift_one_end||!p?.shift_two_start||!p?.shift_two_end)return null;
  const parse=t=>{const [h,m]=toTime(t).split(':').map(Number);return h*60+m;};
- for(const [code,start,end,label] of [['e',p.shift_one_start,p.shift_one_end,p.shift_one_name||'Első műszak'],['n',p.shift_two_start,p.shift_two_end,p.shift_two_name||'Második műszak']]){
+ for(const {code,start,end,label} of configuredShifts()){
   const a=parse(start),b=parse(end),overnight=a>b;
   if(a===b)continue;
   const active=overnight?(now.minute>=a||now.minute<b):(now.minute>=a&&now.minute<b);
@@ -136,8 +148,9 @@ function workingPanel(){
  if(!shift)return `<section class="panel shift-panel shift-card"><div class="shift-card-head"><h2>Ki dolgozik most?</h2></div><p class="hint">Jelenleg nincs aktív, beállított műszak. A műszakidőket a Beállításokban adhatod meg.</p></section>`;
  const month=shift.date.slice(0,7);
  const prefs=state.prefs||{};
- const start=toTime(shift.code==='e'?prefs.shift_one_start:prefs.shift_two_start);
- const end=toTime(shift.code==='e'?prefs.shift_one_end:prefs.shift_two_end);
+ const configured=configuredShifts().find(item=>item.code===shift.code);
+ const start=toTime(configured?.start);
+ const end=toTime(configured?.end);
  const head=shiftCardHeader('Ki dolgozik most?',shift.label,shift.code,shift.date,start,end,null);
  if(month!==state.rosterMonth||state.rosterError)return `<section class="panel shift-panel shift-card">${head}<p class="hint">A beosztás nem érhető el ehhez a hónaphoz. Nyisd meg a Beosztást a frissítéshez.</p><button class="shift-card-link" data-view="roster">Beosztás megnyitása →</button></section>`;
  const workers=workingNow(state.rosterEntries,shift.date,shift.code);
@@ -150,7 +163,7 @@ function nextShiftPanel(){
  }
  const now=budapestParts(),parse=t=>{const [h,m]=toTime(t).split(':').map(Number);return h*60+m;};
  const candidates=[];
- for(const [code,start,end,label] of [['e',p.shift_one_start,p.shift_one_end,p.shift_one_name||'Első műszak'],['n',p.shift_two_start,p.shift_two_end,p.shift_two_name||'Második műszak']]){
+ for(const {code,start,end,label} of configuredShifts()){
   for(let offset=0;offset<=1;offset++){
    const diff=offset*1440+parse(start)-now.minute;
    if(diff<=0)continue;
@@ -249,7 +262,7 @@ function optionalId(id){return id?{id}:{};}
 function openLog(log=null){const l=log||{};
   openEditor(log?'Naplóbejegyzés szerkesztése':'Új naplóbejegyzés',
     field('Dátum',`<input name="shift_date" type="date" required value="${esc(l.shift_date||today())}" />`)+
-    field('Műszak',`<select name="shift_type">${options([['one',state.prefs?.shift_one_name||'Délelőtt'],['two',state.prefs?.shift_two_name||'Délután']],l.shift_type||'one')}</select>`)+
+    field('Műszak',`<select name="shift_type">${options([['one',shiftIsDay(state.prefs?.shift_one_start)?'Nappalos':'Éjszakás'],['two',shiftIsDay(state.prefs?.shift_two_start)?'Nappalos':'Éjszakás']],l.shift_type||'one')}</select>`)+
     `<div class="wide">${field('Esemény címe',`<input name="title" maxlength="140" required value="${esc(l.title||'')}" />`)}</div>`+
     field('Kategória',`<select name="category">${options(categories.map(c=>[c,c]),l.category||'Egyéb')}</select>`)+
     field('Prioritás',`<select name="priority">${options(Object.entries(priorityLabel),l.priority||'normal')}</select>`)+

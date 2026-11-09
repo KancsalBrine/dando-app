@@ -1,19 +1,19 @@
 // Dandó V3.4: havi beosztás, bejelentkezett felhasználónként a Supabase-ben.
 export const EMPLOYEES=['Busai Rita','Kovács Béláné','Szeghalmi Beáta','Váradi Noémi','Sirkó Flóra','Koledich Milán','Petykó Mihályné','Ferov Viktor','Telek Bori','Bartus Tamás','Szűcs Endre','Koledich Csaba','Balázs Roland'];
 const CODES=['e','n','8','sz','p','x',''];
-export const LABELS={'e':'Első műszak','n':'Második műszak','8':'8 óra','sz':'Szabadnap','p':'Egyéb','x':'Távollét','':'Törlés'};
+export const LABELS={'e':'Éjszakás','n':'Nappalos','8':'8 óra','sz':'Szabadnap','p':'Egyéb','x':'Távollét','':'Törlés'};
 let generation=0;
 const htmlEscape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 export function currentMonth(){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Budapest',year:'numeric',month:'2-digit'}).formatToParts(new Date());const v=Object.fromEntries(parts.map(p=>[p.type,p.value]));return `${v.year}-${v.month}`}
 function csvExport(month,data){const [y,m]=month.split('-').map(Number),days=new Date(y,m,0).getDate();const rows=[['Dolgozó',...Array.from({length:days},(_,i)=>String(i+1))],...EMPLOYEES.map((name,i)=>[name,...Array.from({length:days},(_,j)=>data[`${i}-${j+1}`]||'')])];const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`dando-beosztas-${month}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 
 // A régi beosztások indexei változatlanok: Roland a 12-es indexen van.
-// A 8 órás beosztás kizárólag az első (nappalos, e) műszakban jelenik meg.
+// A 8 órás beosztás kizárólag a nappalos (n) műszakban jelenik meg.
 export function workingNow(entries, date, shiftCode){
  const day=Number(date.slice(-2));
  return EMPLOYEES.filter((_,i)=>{
   const code=entries?.[`${i}-${day}`];
-  return code===shiftCode || (code==='8' && shiftCode==='e');
+  return code===shiftCode || (code==='8' && shiftCode==='n');
  });
 }
 function normalizedName(value){return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('hu-HU').replace(/[^a-z0-9]/g,'');}
@@ -75,7 +75,7 @@ async function readScheduleFile(file){
 
 export async function mountRoster(root,supabase,user){
  const ticket=++generation;
- root.innerHTML=`<section class="panel"><div class="section-head"><div><h2>Havi műszakbeosztás</h2><p>13 dolgozó · Balázs Roland az első sorban · felhőben mentve</p></div></div><div class="roster-toolbar"><label>Hónap<input id="rosterMonth" type="month" value="${currentMonth()}"></label><label>Jelölés<select id="rosterCode">${CODES.map(c=>`<option value="${c}">${c||'–'} – ${LABELS[c]}</option>`).join('')}</select></label><label>Beosztás importálása (Excel/CSV)<input id="rosterImport" type="file" accept=".csv,.xlsx,.xls" /></label><button class="button quiet" id="rosterCsv">CSV export</button><button class="button quiet" id="rosterPrint">Nyomtatás</button><button class="button danger" id="rosterClear">Hónap ürítése</button></div><p class="hint" id="rosterStatus" role="status">Betöltés…</p><div class="roster-scroll"><table class="roster-table" id="rosterTable"></table></div><div class="roster-legend">🟢 e – első · 🟡 n – második · 🔵 8 – nyolc óra · 🟩 sz – szabad · 🟣 p – egyéb · 🟥 x – távollét</div><p class="hint">A cellák kattintással szerkeszthetők. A mentés csak sikeres Supabase-visszaigazolás után számít késznek. Más eszközön a Frissítés gombbal töltsd újra az adatokat.</p></section>`;
+ root.innerHTML=`<section class="panel"><div class="section-head"><div><h2>Havi műszakbeosztás</h2><p>13 dolgozó · Balázs Roland az első sorban · felhőben mentve</p></div></div><div class="roster-toolbar"><label>Hónap<input id="rosterMonth" type="month" value="${currentMonth()}"></label><label>Jelölés<select id="rosterCode">${CODES.map(c=>`<option value="${c}">${c||'–'} – ${LABELS[c]}</option>`).join('')}</select></label><label>Beosztás importálása (Excel/CSV)<input id="rosterImport" type="file" accept=".csv,.xlsx,.xls" /></label><button class="button quiet" id="rosterCsv">CSV export</button><button class="button quiet" id="rosterPrint">Nyomtatás</button><button class="button danger" id="rosterClear">Hónap ürítése</button></div><p class="hint" id="rosterStatus" role="status">Betöltés…</p><div class="roster-scroll"><table class="roster-table" id="rosterTable"></table></div><div class="roster-legend">🌙 e – éjszakás · ☀️ n – nappalos · 🔵 8 – nyolc óra · 🟩 sz – szabad · 🟣 p – egyéb · 🟥 x – távollét</div><p class="hint">A cellák kattintással szerkeszthetők. A mentés csak sikeres Supabase-visszaigazolás után számít késznek. Más eszközön a Frissítés gombbal töltsd újra az adatokat.</p></section>`;
  const el=id=>root.querySelector('#'+id),status=(message,error=false)=>{const s=el('rosterStatus');if(s){s.textContent=message;s.style.color=error?'#b82e50':''}};
  let data={},revision=null,loading=false,saving=false;
  const active=()=>ticket===generation&&root.isConnected;

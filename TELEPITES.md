@@ -1,9 +1,10 @@
-# Dandó V4.8 – 8 órás dolgozók javítása
+# Dandó V4.9 – helyes műszak-hozzárendelés
 
-A `8` beosztáskódú dolgozók ezentúl csak a nappalos (első, `e`) műszaknál jelennek meg a főoldalon, éjszakás (`n`) műszaknál nem. A korábbi beosztások és a Supabase-adatok nem változnak.
+A helyes jelölések: `e` = éjszakás (18:00–06:00), `n` = nappalos (06:00–18:00), `8` = csak nappalos.
+A főoldal a beállított kezdési idő alapján azonosítja a nappalos és éjszakás műszakot, ezért akkor is helyes, ha a két műszak sorrendje a Beállításokban fel van cserélve. A beosztás jelmagyarázata is javítva.
 
-A ZIP minden szükséges alkalmazásfájlt tartalmaz, kivéve a személyes `supabase-config.js` konfigurációt. Töltsd fel a ZIP tartalmát a GitHub `main` ág gyökerébe, felülírva a meglévő fájlokat. A `supabase-config.js` fájlt hagyd változatlanul.
+Telepítés: a ZIP tartalmát a GitHub main ág gyökerébe töltsd fel és írd felül a meglévő fájlokat. A `supabase-config.js`-t ne cseréld, nincs a csomagban. SQL-módosítás nem kell.
 
-Nyisd meg: https://kancsalbrine.github.io/dando-app/vezeto.html?v=48
+Megnyitás: https://kancsalbrine.github.io/dando-app/vezeto.html?v=49
 
-Fontos: a javítás az `e` kódot tekinti nappalosnak és az `n` kódot éjszakásnak. A 8 órás dolgozók továbbra is a napi 8 órás kóddal szerepelnek a beosztásban.
+Ha az előző műszak kezdete 18:00, a hozzá tartozó kód `e`; ha 06:00, `n`. A `8` kód soha nem jelenik meg az éjszakás listában. A tényleges jelenlétet a program nem ellenőrzi, csak a beosztást.
