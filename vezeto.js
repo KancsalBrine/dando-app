@@ -123,7 +123,7 @@ function shiftPeople(workers,active){
 }
 function shiftCardHeader(title,label,code,date,start,end,countdown){
  return `<div class="shift-card-head"><h2>${title}</h2><span class="shift-badge ${countdown?'upcoming':'active'}">${countdown?'Hamarosan':'Aktuális műszak'}</span></div>
- <div class="shift-card-time"><span class="shift-symbol ${code==='e'?'sun':'moon'}" aria-hidden="true">${shiftIcon(code)}</span><div class="shift-time-text"><strong>${esc(label)}</strong><small>${esc(start)}–${esc(end)} · ${esc(date)}</small></div>${countdown?`<span class="shift-countdown"><small>Kezdés:</small><strong>${esc(countdown)}</strong></span>`:''}</div>`;
+ <div class="shift-card-time"><span class="shift-symbol ${code==='e'?'moon':'sun'}" aria-hidden="true">${shiftIcon(code)}</span><div class="shift-time-text"><strong>${esc(label)}</strong><small>${esc(start)}–${esc(end)} · ${esc(date)}</small></div>${countdown?`<span class="shift-countdown"><small>Kezdés:</small><strong>${esc(countdown)}</strong></span>`:''}</div>`;
 }
 function workingPanel(){
  const shift=liveShift();
